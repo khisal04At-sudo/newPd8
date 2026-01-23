@@ -1,3 +1,223 @@
+/* استيراد خط Cairo من Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+
+    /* تطبيق الخط على جميع العناصر */
+    * {
+        font-family: 'Cairo', sans-serif;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        direction: rtl;
+    }
+
+    body {
+        @apply antialiased;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* تحسين الأزرار */
+    button,
+    a {
+        transition: all 0.3s ease;
+    }
+}
+
+@layer components {
+
+    /* Glass Card Effect */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    }
+
+    .glass-card-dark {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+        background: linear-gradient(135deg, #10b981 0%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Modern Button */
+    .btn-modern {
+        @apply px-6 py-3 rounded-full font-bold transition-all duration-300;
+        @apply hover:shadow-xl hover:-translate-y-1;
+    }
+
+    .btn-volunteer {
+        @apply btn-modern;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        @apply text-white shadow-lg shadow-volunteer-500/30;
+    }
+
+    .btn-volunteer:hover {
+        @apply shadow-2xl shadow-volunteer-500/50;
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-brand {
+        @apply btn-modern;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        @apply text-white shadow-lg shadow-brand-500/30;
+    }
+
+    .btn-brand:hover {
+        @apply shadow-2xl shadow-brand-500/50;
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Modern Input */
+    .input-modern {
+        @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200;
+        @apply focus:border-brand-500 focus:ring-4 focus:ring-brand-100;
+        @apply transition-all duration-300 outline-none;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-modern:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Card Hover Effect */
+    .card-hover {
+        @apply transition-all duration-300;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Floating Animation */
+    .floating {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* Shimmer Effect for Loading */
+    .shimmer {
+        background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
+    }
+}
+
+@layer utilities {
+
+    /* RTL Support */
+    .rtl {
+        direction: rtl;
+    }
+
+    .ltr {
+        direction: ltr;
+    }
+
+    /* Custom Shadows */
+    .shadow-volunteer {
+        box-shadow: 0 10px 40px rgba(34, 197, 94, 0.25);
+    }
+
+    .shadow-brand {
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Gradient Borders */
+    .border-gradient-volunteer {
+        border: 2px solid;
+        border-image-slice: 1;
+        border-image-source: linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .border-gradient-brand {
+        border: 2px solid;
+        border-image-slice: 1;
+        border-image-source: linear-gradient(135deg, #6366f1, #4338ca);
+    }
+}
+
+/* متغيرات CSS للألوان الشاملة */
+:root {
+    --color-volunteer-primary: #10b981;
+    --color-volunteer-dark: #059669;
+    --color-brand-primary: #3b82f6;
+    --color-brand-dark: #2563eb;
+    --color-text-primary: #1e293b;
+    --color-text-secondary: #64748b;
+    --color-text-muted: #94a3b8;
+    --color-bg-light: #f8fafc;
+    --color-bg-white: #ffffff;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-2xl: 2rem;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* تحسينات للطباعة */
+@media print {
+    .glass-card {
+        background: white !important;
+        backdrop-filter: none !important;
+    }
+}

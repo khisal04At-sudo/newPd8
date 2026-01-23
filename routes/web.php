@@ -21,6 +21,20 @@ Route::middleware('auth')->group(function () {
     Route::post('/opportunities/{opportunity}/apply', [\App\Http\Controllers\OpportunityActionController::class, 'apply'])->name('opportunities.apply');
     Route::post('/opportunities/{opportunity}/save', [\App\Http\Controllers\OpportunityActionController::class, 'save'])->name('opportunities.save');
     Route::post('/opportunities/{opportunity}/share', [\App\Http\Controllers\OpportunityActionController::class, 'share'])->name('opportunities.share');
+    
+    // Volunteer Dashboard Routes
+    Route::prefix('volunteer')->name('volunteer.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\VolunteerDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/applications', [\App\Http\Controllers\VolunteerDashboardController::class, 'applications'])->name('applications');
+        Route::get('/saved', [\App\Http\Controllers\VolunteerDashboardController::class, 'saved'])->name('saved');
+        Route::post('/opportunities/{opportunity}/save', [\App\Http\Controllers\VolunteerDashboardController::class, 'saveOpportunity'])->name('opportunities.save');
+        Route::delete('/opportunities/{opportunity}/unsave', [\App\Http\Controllers\VolunteerDashboardController::class, 'unsaveOpportunity'])->name('opportunities.unsave');
+    });
+    
+    // Application Routes
+    Route::get('/opportunities/{opportunity}/apply-form', [\App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
+    Route::post('/opportunities/{opportunity}/submit-application', [\App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
+    Route::delete('/applications/{application}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])->name('applications.withdraw');
 });
 
 // Route::middleware('auth')->group(function () {

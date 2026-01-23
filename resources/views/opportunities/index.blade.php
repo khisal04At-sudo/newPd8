@@ -3,27 +3,27 @@
 @section('title', 'تصفح الفرص')
 
 @section('content')
-<div style="background: #f8fafc; min-height: 100vh; padding: 2rem 0;">
-    <div style="max-width: 1300px; margin: 0 auto; padding: 0 1.5rem;">
+<div style="background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 50%, #fff1f2 100%); min-height: 100vh; padding: 3rem 0;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 1.5rem;">
         
         <!-- Header & Search -->
-        <div style="margin-bottom: 3rem; text-align: center;">
-            <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 1rem;">اكتشف فرصتك القادمة</h1>
-            <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">تصفح المئات من فرص التطوع والتدريب المتاحة في مختلف المجالات والمدن الليبية.</p>
+        <div style="margin-bottom: 3rem; text-align: center; animation: slideUp 0.6s ease-out;">
+            <h1 class="gradient-text" style="font-size: 3.5rem; font-weight: 900; margin-bottom: 1rem;">اكتشف فرصتك القادمة</h1>
+            <p style="color: #64748b; font-size: 1.2rem; max-width: 700px; margin: 0 auto;">تصفح المئات من فرص التطوع والتدريب المتاحة في مختلف المجالات والمدن الليبية</p>
         </div>
 
         <!-- Filters Section -->
-        <div style="background: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 3rem;">
+        <div class="glass-card" style="border-radius: 1.5rem; padding: 2.5rem; margin-bottom: 3rem; animation: scaleIn 0.5s ease-out;">
             <form action="{{ route('opportunities.index') }}" method="GET">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: end;">
                     
-                    <!-- Search Field -->
-                    <!-- (Search by Title logic can be added to Controller) -->
-                    
                     <!-- Type Filter -->
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">نوع الفرصة</label>
-                        <select name="type" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; transition: border-color 0.2s;">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; color: #1e293b; font-size: 0.95rem;">
+                            <i class="fas fa-filter text-brand-600 ml-2"></i>
+                            نوع الفرصة
+                        </label>
+                        <select name="type" class="input-modern">
                             <option value="all" {{ request('type') == 'all' ? 'selected' : '' }}>الكل</option>
                             <option value="volunteering" {{ request('type') == 'volunteering' ? 'selected' : '' }}>تطوع</option>
                             <option value="training" {{ request('type') == 'training' ? 'selected' : '' }}>تدريب</option>
@@ -32,24 +32,30 @@
 
                     <!-- Category Filter -->
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">التصنيف</label>
-                        <select name="category" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none;">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; color: #1e293b; font-size: 0.95rem;">
+                            <i class="fas fa-th-large text-volunteer-600 ml-2"></i>
+                            التصنيف
+                        </label>
+                        <select name="category" class="input-modern">
                             <option value="all">الكل</option>
-                            <option value="help" {{ request('category') == 'help' ? 'selected' : '' }}>مساعدة إنسانية</option>
-                            <option value="education" {{ request('category') == 'education' ? 'selected' : '' }}>تعليم</option>
-                            <option value="environment" {{ request('category') == 'environment' ? 'selected' : '' }}>بيئة</option>
-                            <option value="entrepreneurship" {{ request('category') == 'entrepreneurship' ? 'selected' : '' }}>ريادة أعمال</option>
-                            <option value="sports" {{ request('category') == 'sports' ? 'selected' : '' }}>رياضة</option>
-                            <option value="arts" {{ request('category') == 'arts' ? 'selected' : '' }}>فنون</option>
-                            <option value="health" {{ request('category') == 'health' ? 'selected' : '' }}>صحة</option>
-                            <option value="technology" {{ request('category') == 'technology' ? 'selected' : '' }}>تكنولوجيا</option>
+                            <option value="مساعدة إنسانية" {{ request('category') == 'مساعدة إنسانية' ? 'selected' : '' }}>مساعدة إنسانية</option>
+                            <option value="تعليم" {{ request('category') == 'تعليم' ? 'selected' : '' }}>تعليم</option>
+                            <option value="بيئة" {{ request('category') == 'بيئة' ? 'selected' : '' }}>بيئة</option>
+                            <option value="ريادة أعمال" {{ request('category') == 'ريادة أعمال' ? 'selected' : '' }}>ريادة أعمال</option>
+                            <option value="رياضة" {{ request('category') == 'رياضة' ? 'selected' : '' }}>رياضة</option>
+                            <option value="فنون" {{ request('category') == 'فنون' ? 'selected' : '' }}>فنون</option>
+                            <option value="صحة" {{ request('category') == 'صحة' ? 'selected' : '' }}>صحة</option>
+                            <option value="تكنولوجيا" {{ request('category') == 'تكنولوجيا' ? 'selected' : '' }}>تكنولوجيا</option>
                         </select>
                     </div>
 
                     <!-- City Filter -->
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">المدينة</label>
-                        <select name="city_id" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none;">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; color: #1e293b; font-size: 0.95rem;">
+                            <i class="fas fa-map-marker-alt text-red-600 ml-2"></i>
+                            المدينة
+                        </label>
+                        <select name="city_id" class="input-modern">
                             <option value="">كل المدن</option>
                             @foreach($cities as $city)
                                 <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
@@ -59,8 +65,11 @@
 
                     <!-- Sort Filter -->
                     <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">الترتيب حسب</label>
-                        <select name="time_filter" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none;">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 700; color: #1e293b; font-size: 0.95rem;">
+                            <i class="fas fa-sort text-purple-600 ml-2"></i>
+                            الترتيب حسب
+                        </label>
+                        <select name="time_filter" class="input-modern">
                             <option value="newest" {{ request('time_filter') == 'newest' ? 'selected' : '' }}>الأحدث أولاً</option>
                             <option value="ending_soon" {{ request('time_filter') == 'ending_soon' ? 'selected' : '' }}>تنتهي قريباً</option>
                             <option value="completed" {{ request('time_filter') == 'completed' ? 'selected' : '' }}>الفرص السابقة</option>
@@ -68,9 +77,9 @@
                     </div>
 
                     <!-- Action Button -->
-                    <div style="grid-column: span 1;">
-                        <button type="submit" style="width: 100%; padding: 0.85rem; background: #4f46e5; color: white; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">
-                            <i class="fas fa-filter"></i> تطبيق الفلتر
+                    <div>
+                        <button type="submit" class="btn-brand w-full">
+                            <i class="fas fa-search ml-2"></i> بحث
                         </button>
                     </div>
                 </div>
@@ -78,10 +87,9 @@
         </div>
 
         <!-- Opportunities Grid -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2.5rem;">
             @forelse($opportunities as $opp)
-                <div style="background: white; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: transform 0.3s; position: relative;" 
-                     onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="card-hover" style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #f1f5f9; position: relative;">
                     
                     <!-- Category Badge -->
                     <div style="position: absolute; top: 1.5rem; right: 1.5rem;">
@@ -130,10 +138,16 @@
                     </div>
                 </div>
             @empty
-                <div style="grid-column: 1 / -1; text-align: center; padding: 5rem 0;">
-                    <i class="fas fa-search" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 1.5rem;"></i>
-                    <h3 style="color: #64748b; font-weight: 600;">لا توجد فرص تطابق هذه الفلاتر حالياً</h3>
-                    <p style="color: #94a3b8;">جرب تغيير خيارات البحث أو العودة لاحقاً.</p>
+                <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 6rem 2rem; background: white; border-radius: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="font-size: 5rem; color: #e2e8f0; margin-bottom: 2rem;">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 style="color: #1e293b; font-weight: 800; font-size: 1.75rem; margin-bottom: 1rem;">لا توجد فرص تطابق هذه الفلاتر حالياً</h3>
+                    <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 2rem;">جرب تغيير خيارات البحث أو العودة لاحقاً للعثور على فرص جديدة</p>
+                    <a href="{{ route('opportunities.index') }}" class="btn-volunteer" style="display: inline-block;">
+                        <i class="fas fa-redo ml-2"></i>
+                        إعادة تعيين الفلاتر
+                    </a>
                 </div>
             @endforelse
         </div>
@@ -147,5 +161,22 @@
 
 <style>
     .hover-accent:hover { color: #f43f5e !important; }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #16a34a 0%, #4338ca 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Empty state animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .empty-state {
+        animation: fadeIn 0.6s ease-out;
+    }
 </style>
 @endsection

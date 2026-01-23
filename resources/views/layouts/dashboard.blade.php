@@ -9,8 +9,8 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --header-height: 70px;
-            --primary-color: #4f46e5;
+            --header-height: 80px;
+            --primary-color: #3b82f6;
             --bg-color: #f8fafc;
         }
         body {
@@ -23,6 +23,7 @@
             min-height: 100vh;
             transition: all 0.3s ease;
             width: 100%;
+            padding-top: calc(var(--header-height) + 20px); /* Adjust for fixed header */
         }
         .main-content.shifted {
             margin-right: var(--sidebar-width);
@@ -30,14 +31,20 @@
         }
         .header {
             height: var(--header-height);
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            border-radius: 10px;
+            padding: 0 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
         }
         .user-nav {
             display: flex;
@@ -71,8 +78,20 @@
             justify-content: center;
         }
         @media (max-width: 768px) {
+            :root {
+                --header-height: 64px;
+            }
             .main-content {
                 margin-right: 0;
+                padding-top: calc(var(--header-height) + 15px);
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            .header {
+                padding: 0 20px;
+            }
+            .welcome-msg {
+                font-size: 14px;
             }
         }
     </style>

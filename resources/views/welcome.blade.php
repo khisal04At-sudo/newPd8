@@ -19,7 +19,6 @@
 
         body {
             background: var(--bg-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             overflow-x: hidden;
             color: var(--text-main);
@@ -27,17 +26,21 @@
 
         /* --- Header --- */
         .navbar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            padding: 0.75rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            position: sticky;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            transition: all 0.3s ease;
         }
 
         .logo-area {
@@ -97,11 +100,14 @@
             border: none;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4); }
+        .btn-primary:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); 
+        }
         .btn-outline {
             background: white;
             border: 2px solid #e2e8f0;
@@ -125,12 +131,22 @@
 
         /* --- Hero Section --- */
         .hero {
-            padding: 8rem 2rem;
+            padding: 12rem 2rem 8rem; /* Extra padding for fixed header */
             position: relative;
-            background: radial-gradient(circle at top left, #eef2ff 0%, transparent 40%),
-                        radial-gradient(circle at bottom right, #fff1f2 0%, transparent 40%);
+            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 50%, #fff1f2 100%);
             text-align: center;
             overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
         }
         .hero-content {
             max-width: 900px;
@@ -141,11 +157,13 @@
         .hero h1 {
             font-size: 4.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+            background: linear-gradient(135deg, #10b981 0%, #2563eb 60%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 1.5rem;
             line-height: 1.1;
+            animation: slideUp 0.8s ease-out;
         }
         .hero p {
             font-size: 1.5rem;
@@ -159,20 +177,36 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            max-width: 1100px;
-            margin: -4rem auto 4rem;
-            background: white;
-            padding: 3rem;
+            max-width: 1200px;
+            margin: -5rem auto 5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 3.5rem;
             border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2),
+                        0 0 0 1px rgba(255, 255, 255, 0.5);
             position: relative;
             z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
+        .stat-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
         .stat-item h3 {
-            font-size: 2.5rem;
-            color: var(--primary);
+            font-size: 3rem;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin: 0;
-            font-weight: 800;
+            font-weight: 900;
         }
         .stat-item p {
             color: var(--text-muted);
@@ -201,14 +235,38 @@
 
         .opp-card {
             width: 320px;
-            background: var(--bg-light);
+            background: white;
             border-radius: 1.5rem;
             padding: 1.5rem;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
         }
-        .opp-card:hover { transform: translateY(-10px); background: #fdfdfd; border-color: var(--primary-light); }
+        
+        .opp-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .opp-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .opp-card:hover { 
+            transform: translateY(-12px); 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: rgba(99, 102, 241, 0.3); 
+        }
         .opp-card .badge {
             background: #dbeafe;
             color: var(--primary);
@@ -282,7 +340,12 @@
 
     <div class="main-content" id="mainContent">
         <nav class="navbar">
-            <div style="display: flex; align-items: center; gap: 2rem;">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                @auth
+                    <button class="toggle-sidebar" onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem; color:var(--primary); cursor:pointer; display: flex; align-items: center;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                @endauth
                 <a href="{{ url('/') }}" class="logo-area">
                     <i class="fas fa-feather-alt"></i>
                     أثيرا
@@ -304,7 +367,6 @@
                         <div class="user-profile" onclick="toggleSidebar()">
                             <span style="font-weight: 600;">{{ auth()->user()->name }}</span>
                             <img src="{{ auth()->user()->avatar_url }}" class="avatar">
-                            <i class="fas fa-bars" style="margin-left: 10px;"></i>
                         </div>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-outline">تسجيل الدخول</a>

@@ -55,6 +55,7 @@ class Opportunity extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'application_deadline' => 'date',
         'is_practical' => 'boolean',
         'has_stipend' => 'boolean',
         'attendance_required' => 'boolean',

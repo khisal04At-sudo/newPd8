@@ -28,23 +28,44 @@
 <style>
     .sidebar {
         width: 260px;
-        height: 100vh;
-        background: #0f172a; /* Darker for Org */
-        color: white;
+        height: calc(100vh - 80px); /* Account for fixed header */
+        background: #ffffff;
+        color: #1e293b;
         position: fixed;
         right: 0;
-        top: 0;
+        top: 80px; /* Start below header */
         padding-top: 20px;
         transition: all 0.3s;
-        z-index: 1000;
+        z-index: 999;
         direction: rtl;
+        border-left: 1px solid #e2e8f0;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+        overflow-y: auto; /* Enable scrolling */
+        /* Custom scrollbar for webkit browsers */
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 #f1f5f9;
+    }
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
     /* Reuse styles from sidebar.blade.php for consistency or import them */
     .sidebar-header {
         padding: 0 25px 20px;
         text-align: center;
-        border-bottom: 1px solid #334155;
+        border-bottom: 1px solid #e2e8f0;
         margin-bottom: 20px;
+        color: #10b981; /* Green for organizations */
+        font-weight: 800;
     }
     .sidebar-menu {
         list-style: none;
@@ -54,15 +75,16 @@
         padding: 15px 25px;
         display: flex;
         align-items: center;
-        color: #cbd5e1;
+        color: #64748b;
         text-decoration: none;
         transition: all 0.2s;
         gap: 12px;
+        font-weight: 600;
     }
     .sidebar-menu li a:hover, .sidebar-menu li a.active {
-        background: #1e293b;
-        color: white;
-        border-right: 4px solid #f59e0b; /* Orange for Org */
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+        color: #10b981;
+        border-right: 4px solid #10b981;
     }
     .sidebar.collapsed {
         transform: translateX(100%);
@@ -70,6 +92,8 @@
     @media (max-width: 768px) {
         .sidebar {
             transform: translateX(100%);
+            top: 64px; /* Smaller header on mobile */
+            height: calc(100vh - 64px);
         }
         .sidebar.show {
             transform: translateX(0);

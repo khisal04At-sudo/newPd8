@@ -20,6 +20,11 @@ class Application extends Model
         'decision_at',
     ];
 
+    protected $casts = [
+        'applied_at' => 'datetime',
+        'decision_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -33,5 +38,10 @@ class Application extends Model
     public function resumFile()
     {
         return $this->belongsTo(File::class, 'resum_file_id');
+    }
+
+    public function decidedBy()
+    {
+        return $this->belongsTo(User::class, 'decision_by');
     }
 }
