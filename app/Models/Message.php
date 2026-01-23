@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Message extends Model
 {
@@ -12,10 +12,9 @@ class Message extends Model
     protected $fillable = [
         'sender_id',
         'receiver_id',
-        'message_content',
+        'message',
         'is_read',
         'read_at',
-        'conversation_id',
     ];
 
     protected $casts = [
@@ -23,56 +22,38 @@ class Message extends Model
         'read_at' => 'datetime',
     ];
 
-    // ============ Relationships ============
-
+    /**
+     * Get the sender of the message
+     */
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /**
+     * Get the receiver of the message
+     */
     public function receiver()
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
-
-    // ============ Scopes ============
-
-    public function scopeUnread($query)
-    {
-        return $query->where('is_read', false);
-    }
-
-    public function scopeConversation($query, $userId1, $userId2)
-    {
-        return $query->where(function($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId1)->where('receiver_id', $userId2);
-        })->orWhere(function($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId2)->where('receiver_id', $userId1);
-        })->orderBy('created_at', 'asc');
-    }
-
-    // ============ Helper Methods ============
 
     /**
      * Mark message as read
      */
     public function markAsRead()
     {
-        if (!$this->is_read) {
-            $this->update([
-                'is_read' => true,
-                'read_at' => now(),
-            ]);
-        }
+        $this->update([
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
     }
 
     /**
-     * Generate conversation ID for two users
+     * Scope for unread messages
      */
-    public static function generateConversationId($userId1, $userId2)
+    public function scopeUnread($query)
     {
-        $ids = [$userId1, $userId2];
-        sort($ids);
-        return implode('_', $ids);
+        return $query->where('is_read', false);
     }
 }

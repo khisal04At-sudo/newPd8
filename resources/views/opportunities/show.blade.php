@@ -46,7 +46,9 @@
                             </div>
                         </div>
                         <div>
-                            <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem;">تنظيم: {{ $opportunity->organization->name }}</div>
+                            <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem;">
+                                تنظيم: <a href="{{ route('organizations.profile', $opportunity->organization) }}" style="color: var(--brand-blue); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">{{ $opportunity->organization->name }}</a>
+                            </div>
                             <div style="font-size: 0.9rem; color: #64748b; margin-top: 0.2rem;">مؤسسة معتمدة في المنصة • عضو منذ {{ $opportunity->organization->created_at->format('Y') }}</div>
                         </div>
                     </div>

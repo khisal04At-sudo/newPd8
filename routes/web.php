@@ -17,6 +17,10 @@ Route::get('/dashboard', [\App\Http\Controllers\Dashboard\DashboardController::c
 Route::get('/opportunities', [\App\Http\Controllers\PublicOpportunityController::class, 'index'])->name('opportunities.index');
 Route::get('/opportunities/{opportunity}', [\App\Http\Controllers\PublicOpportunityController::class, 'show'])->name('opportunities.show');
 
+// Public Profile Routes
+Route::get('/users/{user}/profile', [\App\Http\Controllers\ProfileController::class, 'showUser'])->name('users.profile');
+Route::get('/organizations/{organization}/profile', [\App\Http\Controllers\ProfileController::class, 'showOrganization'])->name('organizations.profile');
+
 Route::middleware('auth')->group(function () {
     Route::post('/opportunities/{opportunity}/apply', [\App\Http\Controllers\OpportunityActionController::class, 'apply'])->name('opportunities.apply');
     Route::post('/opportunities/{opportunity}/save', [\App\Http\Controllers\OpportunityActionController::class, 'save'])->name('opportunities.save');

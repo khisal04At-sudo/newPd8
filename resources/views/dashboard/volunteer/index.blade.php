@@ -105,7 +105,12 @@
                 <div style="flex: 1;">
                     <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">{{ $application->opportunity->title }}</div>
                     <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: #64748b;">
-                        <span><i class="fas fa-building" style="margin-left: 0.25rem;"></i> {{ $application->opportunity->organization->name }}</span>
+                        <span>
+                            <i class="fas fa-building" style="margin-left: 0.25rem;"></i> 
+                            <a href="{{ route('organizations.profile', $application->opportunity->organization) }}" style="color: inherit; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.color='var(--brand-blue)'" onmouseout="this.style.color='#64748b'">
+                                {{ $application->opportunity->organization->name }}
+                            </a>
+                        </span>
                         <span><i class="fas fa-calendar" style="margin-left: 0.25rem;"></i> {{ $application->applied_at->diffForHumans() }}</span>
                     </div>
                 </div>
