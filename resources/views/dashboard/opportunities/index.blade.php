@@ -32,6 +32,7 @@
                                     'pending' => ['bg' => '#fef3c7', 'text' => '#92400e', 'label' => 'قيد المراجعة'],
                                     'accepted' => ['bg' => '#dcfce7', 'text' => '#166534', 'label' => 'مقبول'],
                                     'rejected' => ['bg' => '#fee2e2', 'text' => '#991b1b', 'label' => 'مرفوض'],
+                                    'executing' => ['bg' => '#f5f3ff', 'text' => '#7c3aed', 'label' => 'قيد التنفيذ'],
                                     'completed' => ['bg' => '#e0e7ff', 'text' => '#3730a3', 'label' => 'مكتمل'],
                                 ];
                                 $status = $statusColors[$app->status] ?? ['bg' => '#f1f5f9', 'text' => '#475569', 'label' => $app->status];

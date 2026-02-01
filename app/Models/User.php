@@ -35,6 +35,7 @@ class User extends Authenticatable
         'status',
         'volunteer_hours',
         'points',
+        'admin_rating',
         'region',
         'phone',
     ];
@@ -189,5 +190,47 @@ class User extends Authenticatable
     public function getUnreadNotificationsCountAttribute()
     {
         return $this->notifications()->where('is_read', false)->count();
+    }
+
+    // ============ Admin Management Methods ============
+
+    /**
+     * Check if user is banned
+     */
+    public function isBanned()
+    {
+        return $this->status === 2;
+    }
+
+    /**
+     * Ban user
+     */
+    public function ban()
+    {
+        $this->update(['status' => 2, 'is_active' => false]);
+    }
+
+    /**
+     * Unban user
+     */
+    public function unban()
+    {
+        $this->update(['status' => 1, 'is_active' => true]);
+    }
+
+    /**
+     * Scope for banned users
+     */
+    public function scopeBanned($query)
+    {
+        return $query->where('status', 2);
+    }
+
+    /**
+     * Scope for active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1)->where('is_active', true);
     }
 }

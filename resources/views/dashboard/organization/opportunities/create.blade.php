@@ -32,8 +32,14 @@
     </div>
 
     <!-- Error Display -->
-    <div id="error-container" style="display: none; background: #fee2e2; color: #b91c1c; padding: 1.25rem; border-radius: 1rem; margin-bottom: 2rem;">
-        <ul id="error-list" style="margin: 0; padding-right: 1.5rem; font-weight: 600;"></ul>
+    <div id="error-container" style="{{ $errors->any() ? 'display: block;' : 'display: none;' }} background: #fee2e2; color: #b91c1c; padding: 1.25rem; border-radius: 1rem; margin-bottom: 2rem;">
+        <ul id="error-list" style="margin: 0; padding-right: 1.5rem; font-weight: 600;">
+            @if($errors->any())
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            @endif
+        </ul>
     </div>
 
     <form id="opportunity-form" action="{{ route('organization.opportunities.store') }}" method="POST" enctype="multipart/form-data">
@@ -489,10 +495,24 @@ const stepInfo = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    loadFromLocalStorage();
     setupEventListeners();
+    loadFromLocalStorage();
+    restoreSession();
     updateNavigationButtons();
+    
+    if ("{{ $errors->any() }}") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 });
+
+// Helper to toggle disabled state for hidden inputs
+function toggleSectionInputs(sectionId, enabled) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    section.querySelectorAll('input, select, textarea').forEach(el => {
+        el.disabled = !enabled;
+    });
+}
 
 // Setup event listeners
 function setupEventListeners() {
@@ -524,12 +544,21 @@ function setupEventListeners() {
         
         if (this.value === 'volunteering') {
             volunteeringFields.style.display = 'block';
+            toggleSectionInputs('volunteering-fields', true);
             trainingFields.style.display = 'none';
+            toggleSectionInputs('training-fields', false);
             trainingOutcomesField.style.display = 'none';
         } else if (this.value === 'training') {
             volunteeringFields.style.display = 'none';
+            toggleSectionInputs('volunteering-fields', false);
             trainingFields.style.display = 'block';
+            toggleSectionInputs('training-fields', true);
             trainingOutcomesField.style.display = 'block';
+        } else {
+            volunteeringFields.style.display = 'none';
+            trainingFields.style.display = 'none';
+            toggleSectionInputs('volunteering-fields', false);
+            toggleSectionInputs('training-fields', false);
         }
     });
 
@@ -540,9 +569,11 @@ function setupEventListeners() {
         
         if (this.value === 'in_person') {
             locationFields.style.display = 'block';
+            toggleSectionInputs('location-fields', true);
             cityField.setAttribute('data-required', 'true');
         } else {
             locationFields.style.display = 'none';
+            toggleSectionInputs('location-fields', false);
             cityField.removeAttribute('data-required');
         }
     });
@@ -550,7 +581,13 @@ function setupEventListeners() {
     // Certificate provision change
     document.getElementById('provides_certificate').addEventListener('change', function() {
         const certificateFields = document.getElementById('certificate-fields');
-        certificateFields.style.display = this.value === 'yes' ? 'block' : 'none';
+        if (this.value === 'yes') {
+            certificateFields.style.display = 'block';
+            toggleSectionInputs('certificate-fields', true);
+        } else {
+            certificateFields.style.display = 'none';
+            toggleSectionInputs('certificate-fields', false);
+        }
     });
 
     // Navigation buttons
@@ -577,6 +614,47 @@ function setupEventListeners() {
 
     // Save on input change
     form.addEventListener('input', debounce(autoSave, 2000));
+}
+
+// Restore session values
+function restoreSession() {
+    const old = @json(old());
+    if (old && Object.keys(old).length > 0) {
+        // Trigger toggles first
+        ['type', 'execution_method', 'provides_certificate', 'category'].forEach(id => {
+            if (old[id]) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = old[id];
+                    el.dispatchEvent(new Event('change'));
+                }
+            }
+        });
+
+        // Fill other fields
+        for (const [key, value] of Object.entries(old)) {
+            if (['type', 'execution_method', 'provides_certificate', 'category', 'subcategory', '_token'].includes(key)) continue;
+            
+            const fields = document.querySelectorAll(`[name="${key}"]`);
+            fields.forEach(f => {
+                if (!f.disabled) {
+                    if (f.type === 'checkbox') f.checked = !!value;
+                    else if (f.type !== 'file') f.value = value;
+                }
+            });
+        }
+
+        // Restore subcategory last after a small delay
+        if (old['subcategory']) {
+            setTimeout(() => {
+                const sub = document.getElementById('subcategory');
+                if (sub) {
+                    sub.value = old['subcategory'];
+                    sub.dispatchEvent(new Event('change'));
+                }
+            }, 100);
+        }
+    }
 }
 
 // Navigate between steps

@@ -110,10 +110,15 @@ Route::middleware('auth')->group(function () {
 
         // 2. Manage Opportunities
         Route::resource('opportunities', \App\Http\Controllers\Dashboard\OpportunityManagementController::class);
+        Route::post('/opportunities/{opportunity}/start', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'startExecution'])->name('opportunities.start');
+        Route::post('/opportunities/{opportunity}/complete', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'completeExecution'])->name('opportunities.complete');
+        Route::post('/opportunities/{opportunity}/cancel', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'cancelOpportunity'])->name('opportunities.cancel');
+        Route::get('/opportunities/{opportunity}/tracking', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'tracking'])->name('opportunities.tracking');
 
         // 3. Volunteers / Applications
         Route::get('/applications', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'index'])->name('applications.index');
         Route::post('/applications/{application}/status', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateStatus'])->name('applications.updateStatus');
+        Route::post('/applications/{application}/tracking', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateTracking'])->name('applications.updateTracking');
 
         // 4. Certificates
         Route::get('/certificates', [\App\Http\Controllers\Dashboard\CertificateManagementController::class, 'index'])->name('certificates.index');
@@ -151,6 +156,14 @@ Route::middleware('auth')->group(function () {
             Route::post('/opportunities/{opportunity}/publish', [\App\Http\Controllers\Admin\AdminOpportunityReviewController::class, 'publish'])->name('admin.opportunities.publish');
             Route::post('/opportunities/{opportunity}/request-changes', [\App\Http\Controllers\Admin\AdminOpportunityReviewController::class, 'requestChanges'])->name('admin.opportunities.request-changes');
             Route::post('/opportunities/{opportunity}/reject', [\App\Http\Controllers\Admin\AdminOpportunityReviewController::class, 'reject'])->name('admin.opportunities.reject');
+            
+            // User Management
+            Route::get('/users', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('admin.users.index');
+            Route::get('/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('admin.users.show');
+            Route::post('/users/{user}/ban', [\App\Http\Controllers\Admin\UserManagementController::class, 'ban'])->name('admin.users.ban');
+            Route::post('/users/{user}/unban', [\App\Http\Controllers\Admin\UserManagementController::class, 'unban'])->name('admin.users.unban');
+            Route::post('/users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserManagementController::class, 'toggleActive'])->name('admin.users.toggle-active');
+            Route::post('/users/{user}/rating', [\App\Http\Controllers\Admin\UserManagementController::class, 'updateRating'])->name('admin.users.rating');
             
             Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
         });

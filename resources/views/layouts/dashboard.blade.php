@@ -124,8 +124,30 @@
         </div>
 
         @if(session('success'))
-            <div style="background: #efe; color: #16a34a; padding: 15px; border-radius: 10px; border: 1px solid #bbf7d0; margin-bottom: 20px;">
+            <div style="background: #f0fdf4; color: #16a34a; padding: 1rem; border-radius: 0.75rem; border: 1px solid #bbf7d0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle"></i>
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div style="background: #fef2f2; color: #dc2626; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fecaca; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div style="background: #fffbeb; color: #92400e; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fef3c7; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-weight: 800;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    يرجى تصحيح الأخطاء التالية:
+                </div>
+                <ul style="margin: 0; padding-right: 1.5rem; font-size: 0.9rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 

@@ -5,8 +5,27 @@
 @section('content')
 <div style="font-family: 'Cairo', sans-serif;">
     <div style="margin-bottom: 2.5rem;">
-        <h2 style="margin: 0; color: #1e293b; font-weight: 850; font-size: 1.75rem;">طلبات الانضمام</h2>
-        <p style="color: #64748b; margin-top: 0.25rem; font-size: 0.95rem;">راجع طلبات المتطوعين لاتخاذ قرار القبول أو الرفض</p>
+        @if(isset($opportunity))
+            <div style="margin-bottom: 1rem;">
+                <a href="{{ route('organization.applications.index') }}" 
+                   style="display: inline-flex; align-items: center; gap: 0.5rem; color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: color 0.2s;"
+                   onmouseover="this.style.color='#3b82f6'"
+                   onmouseout="this.style.color='#64748b'">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة لكل الطلبات
+                </a>
+            </div>
+            <h2 style="margin: 0; color: #1e293b; font-weight: 850; font-size: 1.75rem;">
+                متقدمو: {{ $opportunity->title }}
+            </h2>
+            <p style="color: #64748b; margin-top: 0.25rem; font-size: 0.95rem;">
+                <i class="fas fa-users" style="margin-left: 0.5rem;"></i>
+                عدد المتقدمين: {{ $applications->total() }} من أصل {{ $opportunity->seats }} مقعد
+            </p>
+        @else
+            <h2 style="margin: 0; color: #1e293b; font-weight: 850; font-size: 1.75rem;">طلبات الانضمام</h2>
+            <p style="color: #64748b; margin-top: 0.25rem; font-size: 0.95rem;">راجع طلبات المتطوعين لاتخاذ قرار القبول أو الرفض</p>
+        @endif
     </div>
 
     @if(session('success'))
@@ -41,7 +60,10 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <div style="font-weight: 800; color: #1e293b; font-size: 1rem;">{{ $app->user->name }}</div>
+                                    <a href="{{ route('users.profile', $app->user->id) }}" style="font-weight: 800; color: #1e293b; font-size: 1rem; text-decoration: none; transition: color 0.2s; display: inline-flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#1e293b'">
+                                        {{ $app->user->name }}
+                                        <i class="fas fa-external-link-alt" style="font-size: 0.7rem; opacity: 0.6;"></i>
+                                    </a>
                                     <div style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">{{ $app->user->email }}</div>
                                 </div>
                             </div>
@@ -119,7 +141,7 @@
     @if($applications->hasPages())
         <div style="margin-top: 2.5rem; display: flex; justify-content: center;">
             <div style="background: white; padding: 0.75rem; border-radius: 1rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-                {{ $applications->links() }}
+                {{ $applications->appends(request()->query())->links() }}
             </div>
         </div>
     @endif

@@ -456,18 +456,38 @@ const stepInfo = {
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     updateNavigationButtons();
+    
+    // Initial state based on current values
+    ['type', 'execution_method', 'provides_certificate', 'category'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value) {
+            el.dispatchEvent(new Event('change'));
+        }
+    });
 });
+
+// Helper to toggle disabled state for hidden inputs
+function toggleSectionInputs(sectionId, enabled) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    section.querySelectorAll('input, select, textarea').forEach(el => {
+        el.disabled = !enabled;
+    });
+}
 
 function setupEventListeners() {
     // Category change
     document.getElementById('category').addEventListener('change', function() {
         const subSelect = document.getElementById('subcategory');
         const cat = this.value;
+        const currentSub = "{{ old('subcategory', $opportunity->subcategory) }}";
+        
         subSelect.innerHTML = '<option value="">اختر الفئة الفرعية</option>';
         if (cat && subcategories[cat]) {
             subcategories[cat].forEach(sub => {
                 const opt = document.createElement('option');
                 opt.value = opt.textContent = sub;
+                if (sub === currentSub) opt.selected = true;
                 subSelect.appendChild(opt);
             });
         }
@@ -479,21 +499,47 @@ function setupEventListeners() {
         const tFields = document.getElementById('training-fields');
         const tOutField = document.getElementById('training-outcomes-field');
         if (this.value === 'volunteering') {
-            vFields.style.display = 'block'; tFields.style.display = 'none'; tOutField.style.display = 'none';
+            vFields.style.display = 'block';
+            toggleSectionInputs('volunteering-fields', true);
+            tFields.style.display = 'none';
+            toggleSectionInputs('training-fields', false);
+            tOutField.style.display = 'none';
         } else if (this.value === 'training') {
-            vFields.style.display = 'none'; tFields.style.display = 'block'; tOutField.style.display = 'block';
+            vFields.style.display = 'none';
+            toggleSectionInputs('volunteering-fields', false);
+            tFields.style.display = 'block';
+            toggleSectionInputs('training-fields', true);
+            tOutField.style.display = 'block';
+        } else {
+            vFields.style.display = 'none';
+            tFields.style.display = 'none';
+            toggleSectionInputs('volunteering-fields', false);
+            toggleSectionInputs('training-fields', false);
         }
     });
 
     // Execution method change
     document.getElementById('execution_method').addEventListener('change', function() {
         const loc = document.getElementById('location-fields');
-        loc.style.display = this.value === 'in_person' ? 'block' : 'none';
+        if (this.value === 'in_person') {
+            loc.style.display = 'block';
+            toggleSectionInputs('location-fields', true);
+        } else {
+            loc.style.display = 'none';
+            toggleSectionInputs('location-fields', false);
+        }
     });
 
     // Certificate provision
     document.getElementById('provides_certificate').addEventListener('change', function() {
-        document.getElementById('certificate-fields').style.display = this.value === 'yes' ? 'block' : 'none';
+        const certFields = document.getElementById('certificate-fields');
+        if (this.value === 'yes') {
+            certFields.style.display = 'block';
+            toggleSectionInputs('certificate-fields', true);
+        } else {
+            certFields.style.display = 'none';
+            toggleSectionInputs('certificate-fields', false);
+        }
     });
 
     // Navigation

@@ -9,15 +9,34 @@ use Illuminate\Support\Facades\Auth;
 
 class ApplicationManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $organizationId = Auth::user()->organization->id;
         
-        $applications = Application::whereHas('opportunity', function($query) use ($organizationId) {
-            $query->where('organization_id', $organizationId);
-        })->with(['user', 'opportunity'])->latest()->paginate(20);
+        $query = Application::whereHas('opportunity', function($q) use ($organizationId) {
+            $q->where('organization_id', $organizationId);
+        })->with(['user', 'opportunity']);
+        
+        // تصفية حسب الفرصة إذا تم تحديدها
+        if ($request->has('opportunity_id')) {
+            $opportunityId = $request->input('opportunity_id');
+            $query->where('opportunity_id', $opportunityId);
+            
+            // جلب معلومات الفرصة للعرض
+            $opportunity = \App\Models\Opportunity::where('id', $opportunityId)
+                ->where('organization_id', $organizationId)
+                ->first();
+                
+            if (!$opportunity) {
+                abort(404, 'الفرصة غير موجودة');
+            }
+        } else {
+            $opportunity = null;
+        }
+        
+        $applications = $query->latest()->paginate(20);
 
-        return view('dashboard.organization.applications.index', compact('applications'));
+        return view('dashboard.organization.applications.index', compact('applications', 'opportunity'));
     }
 
     public function updateStatus(Request $request, Application $application)
@@ -39,5 +58,25 @@ class ApplicationManagementController extends Controller
         // Logic to notify user could be added here
 
         return back()->with('success', 'تم تحديث حالة الطلب بنجاح.');
+    }
+    public function updateTracking(Request $request, Application $application)
+    {
+        if ($application->opportunity->organization_id !== Auth::user()->organization->id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'attended_hours' => 'required|integer|min:0',
+            'commitment_score' => 'nullable|integer|min:1|max:5',
+            'evaluation_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $application->update([
+            'attended_hours' => $request->attended_hours,
+            'commitment_score' => $request->commitment_score,
+            'evaluation_notes' => $request->evaluation_notes,
+        ]);
+
+        return back()->with('success', 'تم تحديث بيانات التتبع بنجاح.');
     }
 }

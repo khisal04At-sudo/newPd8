@@ -61,7 +61,7 @@
                 @if($achievements->count() > 0)
                 <div class="card" style="padding: 2rem; border-radius: 1.5rem; margin-bottom: 2rem;">
                     <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem;">
-                        <i class="fas fa-trophy" style="color: #f59e0b;"></i> الشهادات والإنجازات
+                        <i class="fas fa-trophy" style="color: #f59e0b;"></i> الإنجازات
                     </h2>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
                         @foreach($achievements as $achievement)
@@ -69,6 +69,41 @@
                             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🏆</div>
                             <div style="font-weight: 700; color: #1e293b; font-size: 0.9rem; margin-bottom: 0.25rem;">{{ $achievement->title }}</div>
                             <div style="font-size: 0.75rem; color: #64748b;">{{ \Carbon\Carbon::parse($achievement->earned_at)->format('Y/m/d') }}</div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- Certificates Section -->
+                @if($user->certificates->count() > 0)
+                <div class="card" style="padding: 2rem; border-radius: 1.5rem; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-award" style="color: #3b82f6;"></i> الشهادات المكتسبة
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem;">
+                        @foreach($user->certificates as $cert)
+                        <div style="background: linear-gradient(135deg, #f8fafc, #ffffff); padding: 1.5rem; border-radius: 1rem; border: 2px solid #e2e8f0; transition: all 0.3s;" onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 20px rgba(59, 130, 246, 0.15)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none'">
+                            <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+                                <i class="fas fa-certificate" style="font-size: 2.5rem; color: #3b82f6;"></i>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 1rem; margin-bottom: 0.5rem;">{{ $cert->title }}</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="far fa-calendar-alt" style="color: #94a3b8;"></i>
+                                        {{ $cert->issue_date->format('Y/m/d') }}
+                                    </div>
+                                    @if($cert->certificate_number)
+                                    <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">
+                                        رقم الشهادة: {{ $cert->certificate_number }}
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($cert->file)
+                                <a href="{{ asset($cert->file->file_url) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #3b82f6; color: white; padding: 0.6rem 1.25rem; border-radius: 0.75rem; text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#3b82f6'; this.style.transform='none'">
+                                    <i class="fas fa-download"></i> تحميل الشهادة
+                                </a>
+                            @endif
                         </div>
                         @endforeach
                     </div>

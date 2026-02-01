@@ -9,6 +9,13 @@ class Application extends Model
 {
     use HasFactory;
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_ACCEPTED = 'accepted';
+    const STATUS_REJECTED = 'rejected';
+    const STATUS_EXECUTING = 'executing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
+
     protected $fillable = [
         'user_id',
         'opportunity_id',
@@ -18,6 +25,9 @@ class Application extends Model
         'cover_letter',
         'applied_at',
         'decision_at',
+        'attended_hours',
+        'commitment_score',
+        'evaluation_notes',
     ];
 
     protected $casts = [

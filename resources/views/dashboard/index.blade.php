@@ -81,16 +81,6 @@
                 <i class="fas fa-star" style="color: #f59e0b;"></i> الفرص المقترحة لك
             </h3>
             <p style="color: #64748b; text-align: center; padding: 40px 0;">قريباً سيتم عرض الفرص التي تناسب مهاراتك هنا...</p>
-        @else
-            <h3 style="margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-rocket" style="color: #4f46e5;"></i> انطلق الآن
-            </h3>
-            <p style="color: #64748b; text-align: center; padding: 20px 0;">بإمكانك البدء بنشر فرص تطوعية أو تدريبية جديدة لجذب المبدعين.</p>
-            <div style="text-align: center;">
-                <a href="{{ route('organization.opportunities.create') }}" style="display: inline-block; padding: 0.75rem 1.5rem; background: #4f46e5; color: white; border-radius: 0.5rem; text-decoration: none; font-weight: 700;">
-                    <i class="fas fa-plus"></i> إضافة فرصة جديدة
-                </a>
-            </div>
         @endif
     </div>
 

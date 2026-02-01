@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
 use App\Models\City;
+use App\Models\Application;
 use App\Helpers\FileUploadHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,12 +25,22 @@ class OpportunityManagementController extends Controller
 
     public function create()
     {
+        if (Auth::user()->organization->status !== 'approved') {
+            return redirect()->route('organization.opportunities.index')
+                ->with('error', 'يجب اعتماد مؤسستكم من قبل الإدارة لتتمكنوا من إضافة فرص جديدة.');
+        }
+
         $cities = City::all();
         return view('dashboard.organization.opportunities.create', compact('cities'));
     }
 
     public function store(Request $request)
     {
+        if (Auth::user()->organization->status !== 'approved') {
+            return redirect()->route('organization.opportunities.index')
+                ->with('error', 'يجب اعتماد مؤسستكم من قبل الإدارة لتتمكنوا من إضافة فرص جديدة.');
+        }
+
         $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'required|string',
@@ -149,6 +160,12 @@ class OpportunityManagementController extends Controller
     public function edit(Opportunity $opportunity)
     {
         $this->authorizeOwner($opportunity);
+
+        if ($opportunity->status == Opportunity::STATUS_COMPLETED) {
+            return redirect()->route('organization.opportunities.index')
+                ->with('error', 'لا يمكن تعديل فرصة مكتملة.');
+        }
+
         $cities = City::all();
         return view('dashboard.organization.opportunities.edit', compact('opportunity', 'cities'));
     }
@@ -156,6 +173,11 @@ class OpportunityManagementController extends Controller
     public function update(Request $request, Opportunity $opportunity)
     {
         $this->authorizeOwner($opportunity);
+        
+        if ($opportunity->status == Opportunity::STATUS_COMPLETED) {
+            return redirect()->route('organization.opportunities.index')
+                ->with('error', 'لا يمكن تعديل فرصة مكتملة.');
+        }
         
         $request->validate([
             'title' => 'required|string|max:100',
@@ -277,11 +299,81 @@ class OpportunityManagementController extends Controller
         return redirect()->route('organization.opportunities.index')->with('success', 'تم تحديث الفرصة بنجاح.');
     }
 
-    public function destroy(Opportunity $opportunity)
+    public function startExecution(Opportunity $opportunity)
     {
         $this->authorizeOwner($opportunity);
-        $opportunity->delete();
-        return back()->with('success', 'تم حذف الفرصة بنجاح.');
+
+        if ($opportunity->status != Opportunity::STATUS_PUBLISHED && $opportunity->status != Opportunity::STATUS_CLOSED) {
+            return back()->with('error', 'لا يمكن بدء تنفيذ هذه الفرصة في حالتها الحالية.');
+        }
+
+        $opportunity->update(['status' => Opportunity::STATUS_UNDER_IMPLEMENTATION]);
+
+        // Update all accepted applications to executing
+        $opportunity->applications()->where('status', Application::STATUS_ACCEPTED)
+            ->update(['status' => Application::STATUS_EXECUTING]);
+
+        return back()->with('success', 'تم بدء تنفيذ الفرصة بنجاح.');
+    }
+
+    public function completeExecution(Opportunity $opportunity)
+    {
+        $this->authorizeOwner($opportunity);
+
+        if ($opportunity->status != Opportunity::STATUS_UNDER_IMPLEMENTATION) {
+            return back()->with('error', 'لا يمكن إنهاء تنفيذ هذه الفرصة في حالتها الحالية.');
+        }
+
+        $opportunity->update(['status' => Opportunity::STATUS_COMPLETED]);
+
+        // Update all executing applications to completed
+        $opportunity->applications()->where('status', Application::STATUS_EXECUTING)
+            ->update(['status' => Application::STATUS_COMPLETED]);
+
+        return back()->with('success', 'تم إنهاء تنفيذ الفرصة بنجاح.');
+    }
+
+    public function cancelOpportunity(Request $request, Opportunity $opportunity)
+    {
+        $this->authorizeOwner($opportunity);
+
+        // يمكن إلغاء الفرص المنشورة أو قيد التنفيذ فقط
+        if (!in_array($opportunity->status, [Opportunity::STATUS_PUBLISHED, Opportunity::STATUS_UNDER_IMPLEMENTATION])) {
+            return back()->with('error', 'لا يمكن إلغاء هذه الفرصة في حالتها الحالية.');
+        }
+
+        $request->validate([
+            'cancellation_reason' => 'required|string|min:10|max:500',
+        ], [
+            'cancellation_reason.required' => 'يجب إدخال سبب الإلغاء.',
+            'cancellation_reason.min' => 'سبب الإلغاء يجب أن يكون 10 أحرف على الأقل.',
+            'cancellation_reason.max' => 'سبب الإلغاء يجب ألا يتجاوز 500 حرف.',
+        ]);
+
+        $opportunity->update([
+            'status' => Opportunity::STATUS_CANCELLED,
+            'cancellation_reason' => $request->cancellation_reason,
+            'cancelled_at' => now(),
+        ]);
+
+        // Update all related applications to cancelled
+        $opportunity->applications()
+            ->whereIn('status', [Application::STATUS_PENDING, Application::STATUS_ACCEPTED, Application::STATUS_EXECUTING])
+            ->update(['status' => Application::STATUS_CANCELLED]);
+
+        return back()->with('success', 'تم إلغاء الفرصة بنجاح.');
+    }
+
+    public function tracking(Opportunity $opportunity)
+    {
+        $this->authorizeOwner($opportunity);
+
+        $applications = $opportunity->applications()
+            ->whereIn('status', [Application::STATUS_EXECUTING, Application::STATUS_COMPLETED])
+            ->with('user')
+            ->get();
+
+        return view('dashboard.organization.opportunities.tracking', compact('opportunity', 'applications'));
     }
 
     private function authorizeOwner(Opportunity $opportunity)

@@ -15,19 +15,19 @@ class ProfileController extends Controller
      */
     public function showUser($userId)
     {
-        $user = User::with(['city'])->findOrFail($userId);
+        $user = User::with(['city', 'certificates.file', 'skills', 'files'])->findOrFail($userId);
         
         // Get user statistics
         $stats = [
             'total_hours' => Application::where('user_id', $userId)
-                ->where('status', 'accepted')
+                ->where('applications.status', 'accepted')
                 ->join('opportunities', 'applications.opportunity_id', '=', 'opportunities.id')
                 ->sum('opportunities.total_hours'),
             'certificates_count' => \DB::table('user_achievements')
                 ->where('user_id', $userId)
                 ->count(),
             'accepted_applications' => Application::where('user_id', $userId)
-                ->where('status', 'accepted')
+                ->where('applications.status', 'accepted')
                 ->count(),
             'total_applications' => Application::where('user_id', $userId)->count(),
         ];
@@ -43,7 +43,7 @@ class ProfileController extends Controller
         
         // Get recent accepted applications
         $recentActivity = Application::where('user_id', $userId)
-            ->where('status', 'accepted')
+            ->where('applications.status', 'accepted')
             ->with(['opportunity', 'opportunity.organization'])
             ->latest()
             ->take(5)

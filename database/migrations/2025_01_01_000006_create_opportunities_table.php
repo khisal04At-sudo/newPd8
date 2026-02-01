@@ -24,11 +24,12 @@ return new class extends Migration
             $table->foreignId('city_id')->constrained('cities')->onDelete('cascade');
 
             $table->integer('seats');
-      //   ( 0 = قبل النشر، 1 = منشورة، 9 = مغلقة، 8 = ملغاة)
 
             $table->text('requires_certification');
 
             $table->smallInteger('status');
+                  //   ( 0 = قبل النشر، 1 = منشورة، 9 = مغلقة، 8 = ملغاة)
+
 
             $table->timestamps();
         });

@@ -50,7 +50,18 @@ class Opportunity extends Model
         'training_duration',
         'is_certified',
         'is_paid',
+        'cancellation_reason',
+        'cancelled_at',
     ];
+
+    const STATUS_REVIEW = 0;
+    const STATUS_PUBLISHED = 1;
+    const STATUS_REJECTED = 3;
+    const STATUS_NEEDS_CHANGES = 2;
+    const STATUS_UNDER_IMPLEMENTATION = 4;
+    const STATUS_COMPLETED = 5;
+    const STATUS_CLOSED = 9;
+    const STATUS_CANCELLED = 8;
 
     protected $casts = [
         'start_date' => 'date',
