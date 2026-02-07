@@ -18,7 +18,7 @@ class ApplicationManagementController extends Controller
         })->with(['user', 'opportunity']);
         
         // تصفية حسب الفرصة إذا تم تحديدها
-        if ($request->has('opportunity_id')) {
+        if ($request->has('opportunity_id') && $request->input('opportunity_id') != '') {
             $opportunityId = $request->input('opportunity_id');
             $query->where('opportunity_id', $opportunityId);
             
@@ -35,8 +35,14 @@ class ApplicationManagementController extends Controller
         }
         
         $applications = $query->latest()->paginate(20);
+        
+        // جلب جميع فرص المؤسسة للفلتر
+        $opportunities = \App\Models\Opportunity::where('organization_id', $organizationId)
+            ->withCount('applications')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return view('dashboard.organization.applications.index', compact('applications', 'opportunity'));
+        return view('dashboard.organization.applications.index', compact('applications', 'opportunity', 'opportunities'));
     }
 
     public function updateStatus(Request $request, Application $application)

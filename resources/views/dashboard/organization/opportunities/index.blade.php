@@ -108,7 +108,7 @@
                                 @endif
 
                                 @if($opp->status == 4)
-                                    <a href="{{ route('organization.opportunities.tracking', $opp) }}" title="تتبع الحضور" style="color: #0d9488; background: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; text-decoration: none; border: 1px solid #ccfbf1; transition: all 0.2s;" onmouseover="this.style.background='#f0fdfa'" onmouseout="this.style.background='white'">
+                                    <a href="{{ route('organization.opportunities.tracking', $opp) }}" title="تتبع التقييم" style="color: #0d9488; background: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; text-decoration: none; border: 1px solid #ccfbf1; transition: all 0.2s;" onmouseover="this.style.background='#f0fdfa'" onmouseout="this.style.background='white'">
                                         <i class="fas fa-users-cog"></i>
                                     </a>
                                     <form action="{{ route('organization.opportunities.complete', $opp) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من إنهاء مرحلة التنفيذ؟ سيتم نقل جميع المشاركين إلى وضع المكتمل.')">
