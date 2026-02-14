@@ -1,0 +1,17 @@
+<?php return [
+    'codeToName' => [],
+    'isUnicode' => true,
+    'FontName' => 'Cairo-Bold',
+    'FullName' => 'Cairo Bold',
+    'FamilyName' => 'Cairo',
+    'Weight' => 'Bold',
+    'ItalicAngle' => '0',
+    'IsFixedPitch' => 'false',
+    'CharacterSet' => 'Unicode',
+    'FontBBox' => ['-657', '-577', '1344', '1025'],
+    'UnderlinePosition' => '-75',
+    'UnderlineThickness' => '50',
+    'Ascent' => '1025',
+    'Descent' => '-577',
+    'FontFile' => storage_path('fonts/Cairo-Bold.ttf'),
+];

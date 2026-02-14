@@ -179,15 +179,13 @@
                                     </form>
                                 </div>
                             @else
-                                <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                    <button onclick="openEvaluationModal({{ $app->id }}, '{{ $app->user->name }}', {{ $app->attended_hours ?? 0 }}, {{ $app->commitment_score ?? 0 }}, '{{ addslashes($app->evaluation_notes ?? '') }}')" 
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3); display: inline-flex; align-items: center; gap: 0.5rem;" 
-                                        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px -1px rgba(102, 126, 234, 0.4)'" 
-                                        onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(102, 126, 234, 0.3)'">
-                                        <i class="fas fa-star"></i>
-                                        تقييم
-                                    </button>
-                                </div>
+                                <a href="{{ route('organization.opportunities.tracking', $app->opportunity) }}" 
+                                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 0.75rem; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3); display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;" 
+                                   onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 12px -1px rgba(102, 126, 234, 0.4)'" 
+                                   onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(102, 126, 234, 0.3)'">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    الذهاب للتتبع والتقييم
+                                </a>
                             @endif
                         </td>
                     </tr>
@@ -217,89 +215,7 @@
     @endif
 </div>
 
-<!-- Evaluation Modal -->
-<div id="evaluationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; font-family: 'Cairo', sans-serif;">
-    <div style="background: white; border-radius: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: modalSlideIn 0.3s ease-out;">
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 2rem 2rem 0 0; position: relative;">
-            <button onclick="closeEvaluationModal()" style="position: absolute; top: 1.5rem; left: 1.5rem; background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
-                <i class="fas fa-times"></i>
-            </button>
-            <div style="text-align: center; color: white;">
-                <div style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; backdrop-filter: blur(10px);">
-                    <i class="fas fa-star" style="font-size: 2.5rem;"></i>
-                </div>
-                <h2 style="margin: 0; font-weight: 850; font-size: 1.75rem;">نموذج التقييم</h2>
-                <p id="applicantName" style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.9;"></p>
-            </div>
-        </div>
 
-        <!-- Form Content -->
-        <form id="evaluationForm" method="POST" style="padding: 2rem;">
-            @csrf
-            
-            <!-- Attended Hours -->
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    <i class="far fa-clock" style="margin-left: 0.5rem; color: #667eea;"></i>
-                    ساعات الحضور
-                </label>
-                <input type="number" name="attended_hours" id="attended_hours" min="0" required
-                    style="width: 100%; padding: 1rem 1.25rem; border: 2px solid #e2e8f0; border-radius: 1rem; font-size: 1rem; font-weight: 600; color: #1e293b; transition: all 0.2s; font-family: 'Cairo', sans-serif;"
-                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'"
-                    onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'"
-                    placeholder="أدخل عدد ساعات الحضور">
-            </div>
-
-            <!-- Commitment Score -->
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    <i class="fas fa-award" style="margin-left: 0.5rem; color: #667eea;"></i>
-                    درجة الالتزام (1-5)
-                </label>
-                <div style="display: flex; gap: 0.75rem; justify-content: space-between;">
-                    <input type="range" name="commitment_score" id="commitment_score" min="1" max="5" value="3"
-                        style="flex: 1; cursor: pointer;"
-                        oninput="document.getElementById('scoreDisplay').textContent = this.value">
-                    <div id="scoreDisplay" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 50px; height: 50px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.25rem; box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.3);">3</div>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: #94a3b8; font-weight: 700;">
-                    <span>ضعيف جداً</span>
-                    <span>متوسط</span>
-                    <span>ممتاز</span>
-                </div>
-            </div>
-
-            <!-- Evaluation Notes -->
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem; font-size: 0.95rem;">
-                    <i class="far fa-comment-dots" style="margin-left: 0.5rem; color: #667eea;"></i>
-                    ملاحظات التقييم
-                </label>
-                <textarea name="evaluation_notes" id="evaluation_notes" rows="4" maxlength="1000"
-                    style="width: 100%; padding: 1rem 1.25rem; border: 2px solid #e2e8f0; border-radius: 1rem; font-size: 0.95rem; font-weight: 600; color: #1e293b; transition: all 0.2s; resize: vertical; font-family: 'Cairo', sans-serif;"
-                    onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'"
-                    onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'"
-                    placeholder="أضف أي ملاحظات حول أداء المتطوع..."></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div style="display: flex; gap: 1rem;">
-                <button type="submit" style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 1rem; font-size: 1rem; font-weight: 900; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.4);" 
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px -1px rgba(102, 126, 234, 0.5)'"
-                    onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(102, 126, 234, 0.4)'">
-                    <i class="fas fa-save" style="margin-left: 0.5rem;"></i>
-                    حفظ التقييم
-                </button>
-                <button type="button" onclick="closeEvaluationModal()" style="flex: 0.3; background: #f1f5f9; color: #64748b; border: none; padding: 1rem; border-radius: 1rem; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s;" 
-                    onmouseover="this.style.background='#e2e8f0'"
-                    onmouseout="this.style.background='#f1f5f9'">
-                    إلغاء
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <style>
     @keyframes modalSlideIn {
@@ -410,51 +326,7 @@
         }
     });
     
-    // Evaluation Modal functionality
-    let currentApplicationId = null;
 
-    function openEvaluationModal(applicationId, applicantName, attendedHours, commitmentScore, evaluationNotes) {
-        currentApplicationId = applicationId;
-        
-        // Update modal content
-        document.getElementById('applicantName').textContent = applicantName;
-        document.getElementById('attended_hours').value = attendedHours || 0;
-        document.getElementById('commitment_score').value = commitmentScore || 3;
-        document.getElementById('scoreDisplay').textContent = commitmentScore || 3;
-        document.getElementById('evaluation_notes').value = evaluationNotes || '';
-        
-        // Update form action
-        document.getElementById('evaluationForm').action = "{{ url('organization/applications') }}/" + applicationId + "/tracking";
-        
-        // Show modal
-        const modal = document.getElementById('evaluationModal');
-        modal.style.display = 'flex';
-        
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeEvaluationModal() {
-        const modal = document.getElementById('evaluationModal');
-        modal.style.display = 'none';
-        
-        // Restore body scroll
-        document.body.style.overflow = 'auto';
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('evaluationModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeEvaluationModal();
-        }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeEvaluationModal();
-        }
-    });
 </script>
 @endsection
 

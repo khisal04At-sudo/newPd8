@@ -16,7 +16,12 @@ class PublicOpportunityController extends Controller
     public function index(Request $request)
     {
         $query = Opportunity::with('organization', 'city')
-            ->where('status', 1); // منشورة فقط
+            ->whereIn('status', [
+                Opportunity::STATUS_PUBLISHED,
+                Opportunity::STATUS_UNDER_IMPLEMENTATION,
+                Opportunity::STATUS_COMPLETED,
+            ]); // عرض الفرص النشطة والمكتملة فقط للمصداقية والشـفافية والابتعاد عن الفرص الملغاة
+
 
         // تصفية حسب النوع
         if ($request->filled('type') && $request->type !== 'all') {

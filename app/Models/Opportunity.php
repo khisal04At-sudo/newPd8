@@ -97,4 +97,14 @@ class Opportunity extends Model
     {
         return $this->belongsTo(City::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(OpportunityReview::class);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?: 0;
+    }
 }

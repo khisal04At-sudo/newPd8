@@ -33,6 +33,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/saved', [\App\Http\Controllers\VolunteerDashboardController::class, 'saved'])->name('saved');
         Route::post('/opportunities/{opportunity}/save', [\App\Http\Controllers\VolunteerDashboardController::class, 'saveOpportunity'])->name('opportunities.save');
         Route::delete('/opportunities/{opportunity}/unsave', [\App\Http\Controllers\VolunteerDashboardController::class, 'unsaveOpportunity'])->name('opportunities.unsave');
+        
+        // My Certificates
+        Route::get('/certificates', function() {
+            $certificates = \App\Models\Certificate::where('user_id', auth()->id())->latest()->get();
+            return view('dashboard.volunteer.certificates', compact('certificates'));
+        })->name('certificates');
+
+        // Opportunity Reviews
+        Route::get('/applications/{application}/review', [\App\Http\Controllers\OpportunityReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/applications/{application}/review', [\App\Http\Controllers\OpportunityReviewController::class, 'store'])->name('reviews.store');
     });
     
     // Application Routes
@@ -119,10 +129,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/applications', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'index'])->name('applications.index');
         Route::post('/applications/{application}/status', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateStatus'])->name('applications.updateStatus');
         Route::post('/applications/{application}/tracking', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateTracking'])->name('applications.updateTracking');
+        Route::get('/applications/{application}/certificate/preview', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'previewCertificate'])->name('applications.certificate.preview');
+        Route::post('/applications/{application}/certificate/issue', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'issueCertificate'])->name('applications.certificate.issue');
+        Route::post('/applications/{application}/certificate/reject', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'rejectCertificate'])->name('applications.certificate.reject');
 
-        // 4. Certificates
         Route::get('/certificates', [\App\Http\Controllers\Dashboard\CertificateManagementController::class, 'index'])->name('certificates.index');
         Route::post('/certificates/issue', [\App\Http\Controllers\Dashboard\CertificateManagementController::class, 'issue'])->name('certificates.issue');
+
+        // 5. Evaluation Requirements
+        Route::get('/evaluation-requirements', function() {
+            return view('dashboard.organization.evaluation_requirements');
+        })->name('evaluation.requirements');
     });
 
     Route::get('/dashboard/opportunities', [\App\Http\Controllers\Dashboard\MyOpportunitiesController::class, 'index'])

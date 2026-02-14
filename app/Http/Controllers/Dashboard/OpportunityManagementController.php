@@ -7,11 +7,19 @@ use App\Models\Opportunity;
 use App\Models\City;
 use App\Models\Application;
 use App\Helpers\FileUploadHelper;
+use App\Services\CertificateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OpportunityManagementController extends Controller
 {
+    protected $certificateService;
+
+    public function __construct(CertificateService $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
+
     public function index()
     {
         $organization = Auth::user()->organization;
@@ -68,7 +76,6 @@ class OpportunityManagementController extends Controller
             'skills_requirement' => 'nullable|string',
             'education_level' => 'nullable|string',
             'previous_experience' => 'nullable|string',
-            'provides_certificate' => 'required|in:yes,no',
             'requires_certification' => 'nullable|string',
             'requires_cover_letter' => 'required|in:yes,no',
             'contact_name' => 'nullable|string',
@@ -85,7 +92,6 @@ class OpportunityManagementController extends Controller
             'category.required' => 'يرجى اختيار الفئة.',
             'seats.required' => 'يرجى تحديد عدد المقاعد المتاحة.',
             'total_hours.required' => 'يرجى إدخال إجمالي عدد الساعات.',
-            'provides_certificate.required' => 'يرجى تحديد ما إذا كان هناك شهادات.',
             'requires_cover_letter.required' => 'يرجى تحديد ما إذا كان يتطلب رسالة تغطية.',
         ]);
 
@@ -129,7 +135,7 @@ class OpportunityManagementController extends Controller
             'skills_requirement' => $request->skills_requirement,
             'education_level' => $request->education_level,
             'previous_experience' => $request->previous_experience,
-            'provides_certificate' => $request->provides_certificate == 'yes',
+            'provides_certificate' => true,
             'requires_certification' => $request->requires_certification,
             'requires_cover_letter' => $request->requires_cover_letter == 'yes',
             'is_practical' => $request->has('is_practical'),
@@ -206,7 +212,6 @@ class OpportunityManagementController extends Controller
             'skills_requirement' => 'nullable|string',
             'education_level' => 'nullable|string',
             'previous_experience' => 'nullable|string',
-            'provides_certificate' => 'required|in:yes,no',
             'requires_certification' => 'nullable|string',
             'requires_cover_letter' => 'required|in:yes,no',
             'contact_name' => 'nullable|string',
@@ -223,7 +228,6 @@ class OpportunityManagementController extends Controller
             'category.required' => 'يرجى اختيار الفئة.',
             'seats.required' => 'يرجى تحديد عدد المقاعد المتاحة.',
             'total_hours.required' => 'يرجى إدخال إجمالي عدد الساعات.',
-            'provides_certificate.required' => 'يرجى تحديد ما إذا كان هناك شهادات.',
             'requires_cover_letter.required' => 'يرجى تحديد ما إذا كان يتطلب رسالة تغطية.',
         ]);
 
@@ -262,7 +266,7 @@ class OpportunityManagementController extends Controller
             'skills_requirement' => $request->skills_requirement,
             'education_level' => $request->education_level,
             'previous_experience' => $request->previous_experience,
-            'provides_certificate' => $request->provides_certificate == 'yes',
+            'provides_certificate' => true,
             'requires_certification' => $request->requires_certification,
             'requires_cover_letter' => $request->requires_cover_letter == 'yes',
             'is_practical' => $request->has('is_practical'),
@@ -327,10 +331,18 @@ class OpportunityManagementController extends Controller
         $opportunity->update(['status' => Opportunity::STATUS_COMPLETED]);
 
         // Update all executing applications to completed
-        $opportunity->applications()->where('status', Application::STATUS_EXECUTING)
-            ->update(['status' => Application::STATUS_COMPLETED]);
+        $applications = $opportunity->applications()->where('status', Application::STATUS_EXECUTING)->get();
+        
+        foreach ($applications as $app) {
+            $app->update(['status' => Application::STATUS_COMPLETED]);
+            
+            // Try to generate certificate if they already have hours/score set
+            if ($this->certificateService->isEligible($app)) {
+                $this->certificateService->generate($app);
+            }
+        }
 
-        return back()->with('success', 'تم إنهاء تنفيذ الفرصة بنجاح.');
+        return back()->with('success', 'تم إنهاء تنفيذ الفرصة بنجاح وتوليد الشهادات للمؤهلين.');
     }
 
     public function cancelOpportunity(Request $request, Opportunity $opportunity)
@@ -369,7 +381,7 @@ class OpportunityManagementController extends Controller
         $this->authorizeOwner($opportunity);
 
         $applications = $opportunity->applications()
-            ->whereIn('status', [Application::STATUS_EXECUTING, Application::STATUS_COMPLETED])
+            ->whereIn('status', [Application::STATUS_ACCEPTED, Application::STATUS_EXECUTING, Application::STATUS_COMPLETED])
             ->with('user')
             ->get();
 

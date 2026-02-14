@@ -28,6 +28,8 @@ class Application extends Model
         'attended_hours',
         'commitment_score',
         'evaluation_notes',
+        'certificate_name',
+        'certificate_status',
     ];
 
     protected $casts = [
@@ -53,5 +55,10 @@ class Application extends Model
     public function decidedBy()
     {
         return $this->belongsTo(User::class, 'decision_by');
+    }
+
+    public function review()
+    {
+        return $this->hasOne(OpportunityReview::class);
     }
 }

@@ -63,6 +63,14 @@
                                 <span style="padding: 0.5rem 1.25rem; background: #d1fae5; color: #059669; border-radius: 99px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
                                     <i class="fas fa-check-circle"></i> مقبول
                                 </span>
+                            @elseif($application->status == 'executing')
+                                <span style="padding: 0.5rem 1.25rem; background: #dbeafe; color: #1d4ed8; border-radius: 99px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
+                                    <i class="fas fa-running"></i> قيد التنفيذ
+                                </span>
+                            @elseif($application->status == 'completed')
+                                <span style="padding: 0.5rem 1.25rem; background: #f0fdf4; color: #15803d; border-radius: 99px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
+                                    <i class="fas fa-medal"></i> مكتمل
+                                </span>
                             @else
                                 <span style="padding: 0.5rem 1.25rem; background: #fee2e2; color: #dc2626; border-radius: 99px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
                                     <i class="fas fa-times-circle"></i> مرفوض
@@ -96,6 +104,28 @@
                             <i class="fas fa-times"></i> سحب التقديم
                         </button>
                     </form>
+                    @endif
+
+                    @if($application->status == 'completed')
+                        @php
+                            $certificate = \App\Models\Certificate::where('application_id', $application->id)->first();
+                        @endphp
+                        
+                        @if($certificate)
+                        <a href="{{ Storage::url($certificate->file_url) }}" target="_blank" style="padding: 0.5rem 1rem; background: #f0f9ff; color: #0369a1; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.9rem; border: 1px solid #bae6fd; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.background='#e0f2fe'" onmouseout="this.style.background='#f0f9ff'">
+                            <i class="fas fa-certificate"></i> عرض الشهادة
+                        </a>
+                        @endif
+
+                        @if(!$application->review)
+                        <a href="{{ route('volunteer.reviews.create', $application) }}" style="padding: 0.5rem 1rem; background: #fff7ed; color: #c2410c; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.9rem; border: 1px solid #ffedd5; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;" onmouseover="this.style.background='#ffedd5'" onmouseout="this.style.background='#fff7ed'">
+                            <i class="fas fa-star"></i> تقييم الفرصة
+                        </a>
+                        @else
+                        <div style="padding: 0.5rem 1rem; background: #f8fafc; color: #94a3b8; border-radius: 0.5rem; font-weight: 700; font-size: 0.9rem; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-check"></i> تم التقييم ({{ $application->review->rating }} نجوم)
+                        </div>
+                        @endif
                     @endif
                 </div>
             </div>

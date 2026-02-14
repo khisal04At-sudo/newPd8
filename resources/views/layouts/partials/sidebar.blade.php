@@ -10,6 +10,7 @@
             <li><a href="{{ route('dashboard.opportunities') }}" class="{{ request()->routeIs('dashboard.opportunities') ? 'active' : '' }}"><i class="fas fa-briefcase"></i> الفرص التطوعية</a></li>
             <li><a href="{{ route('dashboard.notifications') }}" class="{{ request()->routeIs('dashboard.notifications') ? 'active' : '' }}"><i class="fas fa-bell"></i> التنبيهات <span class="badge" style="background:#ef4444; padding:2px 6px; border-radius:10px; font-size:10px;">{{ auth()->user()->unread_notifications_count }}</span></a></li>
             <li><a href="{{ route('dashboard.achievements') }}" class="{{ request()->routeIs('dashboard.achievements') ? 'active' : '' }}"><i class="fas fa-star"></i> الإنجازات</a></li>
+            <li><a href="{{ route('volunteer.certificates') }}" class="{{ request()->routeIs('volunteer.certificates') ? 'active' : '' }}"><i class="fas fa-certificate"></i> شهاداتي</a></li>
             <li><a href="{{ route('dashboard.messages') }}" class="{{ request()->routeIs('dashboard.messages') ? 'active' : '' }}"><i class="fas fa-comments"></i> الرسائل</a></li>
             <li><a href="#"><i class="fas fa-cog"></i> الإعدادات</a></li>
             <li style="margin-top: 50px;">

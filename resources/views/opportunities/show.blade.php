@@ -20,6 +20,28 @@
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #10b981);"></div>
                     
                     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                        @php
+                            $statusLabel = match($opportunity->status) {
+                                1 => 'متاحة للتقديم',
+                                4 => 'قيد التنفيذ',
+                                5 => 'مكتملة',
+                                8 => 'ملغاة',
+                                9 => 'مغلقة',
+                                default => 'غير معروف'
+                            };
+                            $statusColor = match($opportunity->status) {
+                                1 => '#16a34a',
+                                4 => '#2563eb',
+                                5 => '#475569',
+                                8 => '#dc2626',
+                                9 => '#d97706',
+                                default => '#64748b'
+                            };
+                        @endphp
+                        <span style="background: {{ $statusColor }}10; color: {{ $statusColor }}; padding: 0.6rem 1.5rem; border-radius: 2rem; font-size: 0.85rem; font-weight: 800; border: 1px solid {{ $statusColor }}30;">
+                            <i class="fas fa-circle" style="margin-left: 0.5rem; font-size: 0.6rem;"></i>
+                            {{ $statusLabel }}
+                        </span>
                         <span style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 0.6rem 1.5rem; border-radius: 2rem; font-size: 0.85rem; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.1);">
                             <i class="{{ $opportunity->type == 'volunteering' ? 'fas fa-hand-holding-heart' : 'fas fa-graduation-cap' }}" style="margin-left: 0.5rem;"></i>
                             {{ $opportunity->type == 'volunteering' ? 'فرصة تطوعية' : 'فرصة تدريبية' }}
@@ -210,9 +232,14 @@
                         $daysLeft = $deadline->diffInDays(now());
                     @endphp
 
-                    @if($isClosed)
+                    @php
+                        $isApplicationClosed = $isClosed || $opportunity->status != 1;
+                        $closeReason = $isClosed ? 'انتهى موعد التقديم' : ($opportunity->status == 8 ? 'هذه الفرصة تم إلغاؤها' : 'التقديم لهذه الفرصة مغلق حالياً');
+                    @endphp
+
+                    @if($isApplicationClosed)
                         <div style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 1rem; text-align: center; font-weight: 800; margin-bottom: 1.5rem;">
-                            <i class="fas fa-lock" style="margin-left: 0.5rem;"></i> باب التقديم مغلق
+                            <i class="fas fa-lock" style="margin-left: 0.5rem;"></i> {{ $closeReason }}
                         </div>
                     @else
                         <div style="background: #fffbeb; color: #b45309; padding: 1rem; border-radius: 1rem; text-align: center; font-weight: 800; margin-bottom: 1.5rem; font-size: 0.9rem;">

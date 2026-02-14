@@ -23,8 +23,7 @@ class ProfileController extends Controller
                 ->where('applications.status', 'accepted')
                 ->join('opportunities', 'applications.opportunity_id', '=', 'opportunities.id')
                 ->sum('opportunities.total_hours'),
-            'certificates_count' => \DB::table('user_achievements')
-                ->where('user_id', $userId)
+            'certificates_count' => \App\Models\Certificate::where('user_id', $userId)
                 ->count(),
             'accepted_applications' => Application::where('user_id', $userId)
                 ->where('applications.status', 'accepted')

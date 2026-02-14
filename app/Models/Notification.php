@@ -74,14 +74,14 @@ class Notification extends Model
     public function getTypeIconAttribute()
     {
         $icons = [
-            'application_status' => 'file-text',
-            'opportunity' => 'briefcase',
-            'achievement' => 'award',
-            'system' => 'bell',
-            'message' => 'mail',
+            'application_status' => 'fa-file-signature',
+            'opportunity' => 'fa-briefcase',
+            'achievement' => 'fa-medal',
+            'system' => 'fa-bell',
+            'message' => 'fa-envelope',
         ];
 
-        return $icons[$this->type] ?? 'bell';
+        return 'fas ' . ($icons[$this->type] ?? 'fa-bell');
     }
 
     /**
@@ -90,13 +90,13 @@ class Notification extends Model
     public function getTypeColorAttribute()
     {
         $colors = [
-            'application_status' => 'blue',
-            'opportunity' => 'green',
-            'achievement' => 'yellow',
-            'system' => 'gray',
+            'application_status' => 'indigo',
+            'opportunity' => 'emerald',
+            'achievement' => 'amber',
+            'system' => 'slate',
             'message' => 'purple',
         ];
 
-        return $colors[$this->type] ?? 'gray';
+        return $colors[$this->type] ?? 'slate';
     }
 }

@@ -91,10 +91,48 @@
             @forelse($opportunities as $opp)
                 <div class="card-hover" style="background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #f1f5f9; position: relative;">
                     
-                    <!-- Category Badge -->
-                    <div style="position: absolute; top: 1.5rem; right: 1.5rem;">
+                    <!-- Badges -->
+                    <div style="position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: 0.5rem; flex-direction: column; align-items: flex-end;">
                         <span style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 700; backdrop-filter: blur(4px);">
                             {{ $opp->type == 'volunteering' ? 'تطوع' : 'تدريب' }}
+                        </span>
+
+                        @php
+                            $statusLabel = 'غير معروف';
+                            $statusColor = '#64748b';
+                            $statusBg = 'rgba(100, 116, 139, 0.1)';
+
+                            switch($opp->status) {
+                                case 1:
+                                    $statusLabel = 'متاحة للتقديم';
+                                    $statusColor = '#16a34a';
+                                    $statusBg = 'rgba(22, 163, 74, 0.1)';
+                                    break;
+                                case 4:
+                                    $statusLabel = 'قيد التنفيذ';
+                                    $statusColor = '#2563eb';
+                                    $statusBg = 'rgba(37, 99, 235, 0.1)';
+                                    break;
+                                case 5:
+                                    $statusLabel = 'مكتملة';
+                                    $statusColor = '#475569';
+                                    $statusBg = 'rgba(71, 85, 105, 0.1)';
+                                    break;
+                                case 8:
+                                    $statusLabel = 'ملغاة';
+                                    $statusColor = '#dc2626';
+                                    $statusBg = 'rgba(220, 38, 38, 0.1)';
+                                    break;
+                                case 9:
+                                    $statusLabel = 'مغلقة';
+                                    $statusColor = '#d97706';
+                                    $statusBg = 'rgba(217, 119, 6, 0.1)';
+                                    break;
+                            }
+                        @endphp
+                        <span style="background: {{ $statusBg }}; color: {{ $statusColor }}; padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; font-weight: 700; backdrop-filter: blur(4px); border: 1px solid {{ $statusColor }}33;">
+                            <i class="fas fa-circle" style="font-size: 0.5rem; margin-left: 4px; vertical-align: middle;"></i>
+                            {{ $statusLabel }}
                         </span>
                     </div>
 
@@ -113,8 +151,8 @@
                         <!-- Info Tags -->
                         <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
-                                <i class="fas fa-map-marker-alt" style="color: #4f46e5;"></i>
-                                {{ $opp->city->name }}
+                                <i class="fas fa-{{ $opp->execution_method == 'remote' ? 'laptop' : 'map-marker-alt' }}" style="color: #4f46e5;"></i>
+                                {{ $opp->execution_method == 'remote' ? 'عن بُعد' : ($opp->city ? $opp->city->name : 'حضوري') }}
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
                                 <i class="fas fa-clock" style="color: #4f46e5;"></i>

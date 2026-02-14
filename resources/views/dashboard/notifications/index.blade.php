@@ -9,8 +9,8 @@
     <div class="notifications-list">
         @forelse($notifications as $notification)
             <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 20px; align-items: center; {{ !$notification->is_read ? 'background: #f8fafc;' : '' }}">
-                <div style="width: 45px; height: 45px; border-radius: 50%; background: {{ $notification->type_color == 'indigo' ? '#e0e7ff' : ($notification->type_color == 'emerald' ? '#dcfce7' : ($notification->type_color == 'amber' ? '#fef3c7' : '#f1f5f9')) }}; display: flex; align-items: center; justify-content: center; color: {{ $notification->type_color == 'indigo' ? '#4338ca' : ($notification->type_color == 'emerald' ? '#059669' : ($notification->type_color == 'amber' ? '#d97706' : '#475569')) }};">
-                    <i class="fas {{ $notification->type_icon }}"></i>
+                <div style="width: 45px; height: 45px; border-radius: 50%; background: {{ $notification->type_color == 'indigo' ? '#e0e7ff' : ($notification->type_color == 'emerald' ? '#dcfce7' : ($notification->type_color == 'amber' ? '#fef3c7' : ($notification->type_color == 'purple' ? '#f3e8ff' : '#f1f5f9'))) }}; display: flex; align-items: center; justify-content: center; color: {{ $notification->type_color == 'indigo' ? '#4338ca' : ($notification->type_color == 'emerald' ? '#059669' : ($notification->type_color == 'amber' ? '#d97706' : ($notification->type_color == 'purple' ? '#7e22ce' : '#475569'))) }};">
+                    <i class="{{ $notification->type_icon }}"></i>
                 </div>
                 <div style="flex: 1;">
                     <div style="font-weight: 600; color: #1e293b;">{{ $notification->title }}</div>

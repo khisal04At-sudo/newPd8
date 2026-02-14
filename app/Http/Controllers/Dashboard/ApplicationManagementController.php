@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
+use App\Services\CertificateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ApplicationManagementController extends Controller
 {
+    protected $certificateService;
+
+    public function __construct(CertificateService $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
+
     public function index(Request $request)
     {
         $organizationId = Auth::user()->organization->id;
@@ -61,6 +69,16 @@ class ApplicationManagementController extends Controller
             'decision_at' => now()
         ]);
 
+        // إذا تم قبول المتقدم، تحقق من اكتمال المقاعد لإغلاق الفرصة تلقائياً
+        if ($request->status === 'accepted') {
+            $opportunity = $application->opportunity;
+            $acceptedCount = $opportunity->applications()->where('status', 'accepted')->count();
+            
+            if ($acceptedCount >= $opportunity->seats && $opportunity->status == \App\Models\Opportunity::STATUS_PUBLISHED) {
+                $opportunity->update(['status' => \App\Models\Opportunity::STATUS_CLOSED]);
+            }
+        }
+
         // Logic to notify user could be added here
 
         return back()->with('success', 'تم تحديث حالة الطلب بنجاح.');
@@ -75,14 +93,67 @@ class ApplicationManagementController extends Controller
             'attended_hours' => 'required|integer|min:0',
             'commitment_score' => 'nullable|integer|min:1|max:5',
             'evaluation_notes' => 'nullable|string|max:1000',
+            'certificate_name' => 'nullable|string|max:255',
         ]);
 
-        $application->update([
+        $updateData = [
             'attended_hours' => $request->attended_hours,
             'commitment_score' => $request->commitment_score,
             'evaluation_notes' => $request->evaluation_notes,
-        ]);
+            'certificate_name' => $request->certificate_name,
+        ];
 
-        return back()->with('success', 'تم تحديث بيانات التتبع بنجاح.');
+        // إذا تم تغيير التقييم وكان هناك شهادة سابقة، قد نحتاج لتنبيه المستخدم أو تغيير الحالة
+        if ($application->certificate_status === 'approved') {
+            // بقاؤها "approved" يعني أن الشهادة المصدرة قد لا تتطابق مع التقييم الجديد
+            // لذا سنحولها إلى "under_review" ليقوموا باعتمادها مجدداً لو أرادوا
+            $updateData['certificate_status'] = 'under_review';
+        } elseif ($application->certificate_status === 'draft') {
+            $updateData['certificate_status'] = 'under_review';
+        }
+
+        $application->update($updateData);
+
+        return back()->with('success', 'تم تحديث بيانات التتبع بنجاح. يمكنك الآن معاينة الشهادة أو اعتمادها.');
+    }
+
+    public function previewCertificate(Application $application)
+    {
+        if ($application->opportunity->organization_id !== Auth::user()->organization->id) {
+            abort(403);
+        }
+
+        return $this->certificateService->preview($application)->stream('certificate-preview.pdf');
+    }
+
+    public function issueCertificate(Application $application)
+    {
+        if ($application->opportunity->organization_id !== Auth::user()->organization->id) {
+            abort(403);
+        }
+
+        if (!$this->certificateService->isEligible($application)) {
+            return back()->with('error', 'المتقدم غير مؤهل للحصول على شهادة (يجب حضور 70% على الأقل وتقييم 3 فأعلى).');
+        }
+
+        $certificate = $this->certificateService->generate($application);
+
+        if ($certificate) {
+            $application->update(['certificate_status' => 'approved']);
+            return back()->with('success', 'تم اعتماد وإصدار الشهادة بنجاح.');
+        }
+
+        return back()->with('error', 'فشل إصدار الشهادة. يرجى مراجعة البيانات.');
+    }
+
+    public function rejectCertificate(Application $application)
+    {
+        if ($application->opportunity->organization_id !== Auth::user()->organization->id) {
+            abort(403);
+        }
+
+        $application->update(['certificate_status' => 'rejected']);
+
+        return back()->with('success', 'تم رفض إصدار الشهادة في حالتها الحالية.');
     }
 }

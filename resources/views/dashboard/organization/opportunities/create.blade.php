@@ -281,30 +281,8 @@
         <div class="form-step" data-step="3" style="display: none;">
             <div class="card" style="padding: 2rem; border-radius: 1.5rem; border: none;">
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
-                    <div>
-                        <label class="form-label">هل توفر شهادات؟ <span style="color: #ef4444;">*</span></label>
-                        <select name="provides_certificate" id="provides_certificate" class="form-input" data-required="true">
-                            <option value="">اختر</option>
-                            <option value="yes">نعم</option>
-                            <option value="no">لا</option>
-                        </select>
-                        <div class="field-error"></div>
-                    </div>
+                    <!-- Removed certificate fields as they are now automated -->
 
-                    <div id="certificate-fields" style="display: none; grid-column: span 2;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; background: #f8fafc; padding: 1.25rem; border-radius: 1rem;">
-                            <div>
-                                <label class="form-label">نوع الشهادة</label>
-                                <input type="text" name="requires_certification" id="certificate_type" class="form-input" placeholder="مثال: شهادة تطوع معتمدة">
-                                <div class="field-error"></div>
-                            </div>
-                            <div>
-                                <label class="form-label">نموذج الشهادة (اختياري)</label>
-                                <input type="file" name="certificate_file" id="certificate_file" accept=".pdf,image/*" class="form-input">
-                                <div class="field-error"></div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div>
                         <label class="form-label">هل تحتاج رسالة تغطية؟ <span style="color: #ef4444;">*</span></label>
@@ -578,17 +556,8 @@ function setupEventListeners() {
         }
     });
 
-    // Certificate provision change
-    document.getElementById('provides_certificate').addEventListener('change', function() {
-        const certificateFields = document.getElementById('certificate-fields');
-        if (this.value === 'yes') {
-            certificateFields.style.display = 'block';
-            toggleSectionInputs('certificate-fields', true);
-        } else {
-            certificateFields.style.display = 'none';
-            toggleSectionInputs('certificate-fields', false);
-        }
-    });
+    // Certificate provision removed as it is now automated
+
 
     // Navigation buttons
     prevBtn.addEventListener('click', () => navigateStep(-1));
@@ -621,7 +590,7 @@ function restoreSession() {
     const old = @json(old());
     if (old && Object.keys(old).length > 0) {
         // Trigger toggles first
-        ['type', 'execution_method', 'provides_certificate', 'category'].forEach(id => {
+        ['type', 'execution_method', 'category'].forEach(id => {
             if (old[id]) {
                 const el = document.getElementById(id);
                 if (el) {

@@ -10,6 +10,7 @@
             <li><a href="{{ route('organization.opportunities.index') }}" class="{{ request()->routeIs('organization.opportunities.*') ? 'active' : '' }}"><i class="fas fa-briefcase"></i> إدارة الفرص</a></li>
             <li><a href="{{ route('organization.applications.index') }}" class="{{ request()->routeIs('organization.applications.*') ? 'active' : '' }}"><i class="fas fa-users"></i> المتقدمين</a></li>
             <li><a href="{{ route('organization.certificates.index') }}" class="{{ request()->routeIs('organization.certificates.*') ? 'active' : '' }}"><i class="fas fa-certificate"></i> الشهادات</a></li>
+            <li><a href="{{ route('organization.evaluation.requirements') }}" class="{{ request()->routeIs('organization.evaluation.requirements') ? 'active' : '' }}"><i class="fas fa-info-circle"></i> شروط التقييم</a></li>
             <li><a href="{{ route('dashboard.messages') }}" class="{{ request()->routeIs('dashboard.messages') ? 'active' : '' }}"><i class="fas fa-comments"></i> الرسائل</a></li>
             <li><a href="{{ route('dashboard.notifications') }}" class="{{ request()->routeIs('dashboard.notifications') ? 'active' : '' }}"><i class="fas fa-bell"></i> التنبيهات <span class="badge" style="background:#ef4444; padding:2px 6px; border-radius:10px; font-size:10px;">{{ auth()->user()->unread_notifications_count }}</span></a></li>
             

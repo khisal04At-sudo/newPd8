@@ -12,16 +12,24 @@ class Certificate extends Model
     protected $fillable = [
         'user_id',
         'opportunity_id',
+        'application_id',
         'file_id',
+        'file_url',
         'title',
         'certificate_number',
         'issue_date',
         'is_downloadable',
+        'attendance_percentage',
+        'total_hours',
+        'attended_hours',
+        'organization_name',
+        'opportunity_title',
     ];
 
     protected $casts = [
         'issue_date' => 'date',
         'is_downloadable' => 'boolean',
+        'attendance_percentage' => 'decimal:2',
     ];
 
     // ============ Relationships ============
@@ -34,6 +42,11 @@ class Certificate extends Model
     public function opportunity()
     {
         return $this->belongsTo(Opportunity::class);
+    }
+
+    public function application()
+    {
+        return $this->belongsTo(Application::class);
     }
 
     public function file()

@@ -131,45 +131,67 @@
 
         /* --- Hero Section --- */
         .hero {
-            padding: 12rem 2rem 8rem; /* Extra padding for fixed header */
+            padding: 14rem 2rem 10rem;
             position: relative;
-            background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 50%, #fff1f2 100%);
+            background: #0f172a; /* Fallback background */
             text-align: center;
             overflow: hidden;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
         }
         
-        .hero::before {
-            content: '';
+        .hero-bg-container {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            animation: float 20s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
+
+        .hero-bg-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.7) 0%, rgba(15, 23, 42, 0.5) 100%);
+            z-index: 1;
+        }
+        
         .hero-content {
             max-width: 900px;
             margin: 0 auto;
             position: relative;
             z-index: 2;
         }
+
         .hero h1 {
             font-size: 4.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #10b981 0%, #2563eb 60%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
             margin-bottom: 1.5rem;
             line-height: 1.1;
             animation: slideUp 0.8s ease-out;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+
         .hero p {
             font-size: 1.5rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 3rem;
             line-height: 1.6;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         /* --- Stats Section --- */
@@ -357,10 +379,7 @@
                 </div>
             </div>
 
-            <div class="search-bar">
-                <i class="fas fa-search" style="color: #94a3b8;"></i>
-                <input type="text" placeholder="ابحث عن فرصة تطوعية...">
-                </div>
+           
 
                 <div class="auth-actions">
                     @auth
@@ -376,12 +395,26 @@
         </nav>
 
         <section class="hero">
+            <!-- Background Media Container -->
+            <div class="hero-bg-container">
+                {{-- Example video - can be replaced with actual path --}}
+                <!-- {{-- <video autoplay muted loop playsinline class="hero-bg-media">
+                    <source src="{{ asset('assets/videos/hero-bg.mp4') }}" type="video/mp4">
+                </video> --}} -->
+                
+                {{-- Placeholder Image - you can change this to any image path --}}
+                <img src="assets/images/image.png" class="hero-bg-media" alt="Background">
+            </div>
+
+            <!-- Glassy Overlay -->
+            <div class="hero-overlay"></div>
+
             <div class="hero-content">
                 <h1>أثيرا: اصنع أثراً يمتد <br> عبر التطوع والتدريب</h1>
                 <p>بوابتك الذكية لاكتشاف الفرص التي تنمي مهاراتك وتخدم مجتمعك. انضم إلى الآلاف من المتطوعين المبدعين اليوم.</p>
                 <div style="display: flex; gap: 1.5rem; justify-content: center;">
                     <a href="{{ route('opportunities.index') }}" class="btn btn-primary" style="padding: 1.2rem 3rem; font-size: 1.1rem;">استكشف الفرص الآن</a>
-                    <a href="#" class="btn btn-outline" style="padding: 1.2rem 3rem; font-size: 1.1rem;">كيف أبدأ؟</a>
+                    <a href="#" class="btn btn-outline" style="padding: 1.2rem 3rem; font-size: 1.1rem; border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">كيف أبدأ؟</a>
                 </div>
             </div>
         </section>

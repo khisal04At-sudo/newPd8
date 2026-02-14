@@ -301,37 +301,8 @@
         <div class="form-step" data-step="3" style="display: none;">
             <div class="card" style="padding: 2rem; border-radius: 1.5rem; border: none;">
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem;">
-                    <div>
-                        <label class="form-label">هل توفر شهادات؟ <span style="color: #ef4444;">*</span></label>
-                        <select name="provides_certificate" id="provides_certificate" class="form-input" data-required="true">
-                            <option value="">اختر</option>
-                            <option value="yes" {{ (old('provides_certificate') ?? ($opportunity->requires_certification ? 'yes' : '')) == 'yes' ? 'selected' : '' }}>نعم</option>
-                            <option value="no" {{ (old('provides_certificate') ?? ($opportunity->requires_certification ? '' : 'no')) == 'no' ? 'selected' : '' }}>لا</option>
-                        </select>
-                        <div class="field-error"></div>
-                    </div>
+                    <!-- Removed certificate fields as they are now automated -->
 
-                    <div id="certificate-fields" style="{{ (old('provides_certificate') ?? ($opportunity->requires_certification ? 'yes' : '')) == 'yes' ? 'display: block;' : 'display: none;' }} grid-column: span 2;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; background: #f8fafc; padding: 1.25rem; border-radius: 1rem;">
-                            <div>
-                                <label class="form-label">نوع الشهادة</label>
-                                <input type="text" name="requires_certification" id="certificate_type" class="form-input" value="{{ old('requires_certification', $opportunity->requires_certification) }}" placeholder="مثال: شهادة تطوع معتمدة">
-                                <div class="field-error"></div>
-                            </div>
-                            <div>
-                                <label class="form-label">نموذج الشهادة (ملف جديد)</label>
-                                <input type="file" name="certificate_file" id="certificate_file" accept=".pdf,image/*" class="form-input">
-                                @if($opportunity->certificateFile)
-                                    <div style="margin-top: 0.5rem;">
-                                        <a href="{{ asset($opportunity->certificateFile->file_url) }}" target="_blank" style="font-size: 0.85rem; color: #4f46e5; text-decoration: none; font-weight: 600;">
-                                            <i class="fas fa-file-pdf"></i> عرض النموذج الحالي
-                                        </a>
-                                    </div>
-                                @endif
-                                <div class="field-error"></div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div>
                         <label class="form-label">هل تحتاج رسالة تغطية؟ <span style="color: #ef4444;">*</span></label>
@@ -530,17 +501,8 @@ function setupEventListeners() {
         }
     });
 
-    // Certificate provision
-    document.getElementById('provides_certificate').addEventListener('change', function() {
-        const certFields = document.getElementById('certificate-fields');
-        if (this.value === 'yes') {
-            certFields.style.display = 'block';
-            toggleSectionInputs('certificate-fields', true);
-        } else {
-            certFields.style.display = 'none';
-            toggleSectionInputs('certificate-fields', false);
-        }
-    });
+    // Certificate provision removed as it is now automated
+
 
     // Navigation
     prevBtn.addEventListener('click', () => navigateStep(-1));
