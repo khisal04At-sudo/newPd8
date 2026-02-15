@@ -111,10 +111,15 @@ Route::middleware('auth')->group(function () {
     // Dashboard Sections
     Route::get('/dashboard/profile', [\App\Http\Controllers\Dashboard\UserProfileController::class, 'show'])
         ->name('dashboard.profile');
+    Route::get('/dashboard/profile/edit', [\App\Http\Controllers\Dashboard\UserProfileController::class, 'edit'])
+        ->name('dashboard.profile.edit');
+    Route::post('/dashboard/profile', [\App\Http\Controllers\Dashboard\UserProfileController::class, 'update'])
+        ->name('dashboard.profile.update');
     
     // Organization Specific Routes
     Route::middleware(['auth'])->prefix('organization')->name('organization.')->group(function () {
         // 1. Institution Profile
+        Route::get('/profile/show', [\App\Http\Controllers\Dashboard\OrganizationProfileController::class, 'show'])->name('profile.show');
         Route::get('/profile', [\App\Http\Controllers\Dashboard\OrganizationProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile', [\App\Http\Controllers\Dashboard\OrganizationProfileController::class, 'update'])->name('profile.update');
 

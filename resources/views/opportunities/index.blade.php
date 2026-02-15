@@ -23,7 +23,7 @@
                             <i class="fas fa-filter text-brand-600 ml-2"></i>
                             نوع الفرصة
                         </label>
-                        <select name="type" class="input-modern">
+                        <select name="type" class="input-modern" onchange="this.form.submit()">
                             <option value="all" {{ request('type') == 'all' ? 'selected' : '' }}>الكل</option>
                             <option value="volunteering" {{ request('type') == 'volunteering' ? 'selected' : '' }}>تطوع</option>
                             <option value="training" {{ request('type') == 'training' ? 'selected' : '' }}>تدريب</option>
@@ -36,7 +36,7 @@
                             <i class="fas fa-th-large text-volunteer-600 ml-2"></i>
                             التصنيف
                         </label>
-                        <select name="category" class="input-modern">
+                        <select name="category" class="input-modern" onchange="this.form.submit()">
                             <option value="all">الكل</option>
                             <option value="مساعدة إنسانية" {{ request('category') == 'مساعدة إنسانية' ? 'selected' : '' }}>مساعدة إنسانية</option>
                             <option value="تعليم" {{ request('category') == 'تعليم' ? 'selected' : '' }}>تعليم</option>
@@ -55,7 +55,7 @@
                             <i class="fas fa-map-marker-alt text-red-600 ml-2"></i>
                             المدينة
                         </label>
-                        <select name="city_id" class="input-modern">
+                        <select name="city_id" class="input-modern" onchange="this.form.submit()">
                             <option value="">كل المدن</option>
                             @foreach($cities as $city)
                                 <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
@@ -69,19 +69,14 @@
                             <i class="fas fa-sort text-purple-600 ml-2"></i>
                             الترتيب حسب
                         </label>
-                        <select name="time_filter" class="input-modern">
+                        <select name="time_filter" class="input-modern" onchange="this.form.submit()">
                             <option value="newest" {{ request('time_filter') == 'newest' ? 'selected' : '' }}>الأحدث أولاً</option>
                             <option value="ending_soon" {{ request('time_filter') == 'ending_soon' ? 'selected' : '' }}>تنتهي قريباً</option>
                             <option value="completed" {{ request('time_filter') == 'completed' ? 'selected' : '' }}>الفرص السابقة</option>
                         </select>
                     </div>
 
-                    <!-- Action Button -->
-                    <div>
-                        <button type="submit" class="btn-brand w-full">
-                            <i class="fas fa-search ml-2"></i> بحث
-                        </button>
-                    </div>
+
                 </div>
             </form>
         </div>

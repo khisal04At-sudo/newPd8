@@ -9,6 +9,15 @@ use App\Models\City;
 
 class OrganizationProfileController extends Controller
 {
+    /**
+     * Show the organization profile.
+     */
+    public function show()
+    {
+        $user = Auth::user()->load('organization', 'city');
+        return view('dashboard.organization.show', compact('user'));
+    }
+
     public function edit()
     {
         $user = Auth::user()->load('organization');
