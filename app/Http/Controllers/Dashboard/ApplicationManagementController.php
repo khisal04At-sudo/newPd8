@@ -91,7 +91,7 @@ class ApplicationManagementController extends Controller
 
         $request->validate([
             'attended_hours' => 'required|integer|min:0',
-            'commitment_score' => 'nullable|integer|min:1|max:5',
+            'commitment_score' => 'nullable|integer|min:1|max:100',
             'evaluation_notes' => 'nullable|string|max:1000',
             'certificate_name' => 'nullable|string|max:255',
         ]);
@@ -105,14 +105,20 @@ class ApplicationManagementController extends Controller
 
         // إذا تم تغيير التقييم وكان هناك شهادة سابقة، قد نحتاج لتنبيه المستخدم أو تغيير الحالة
         if ($application->certificate_status === 'approved') {
-            // بقاؤها "approved" يعني أن الشهادة المصدرة قد لا تتطابق مع التقييم الجديد
-            // لذا سنحولها إلى "under_review" ليقوموا باعتمادها مجدداً لو أرادوا
             $updateData['certificate_status'] = 'under_review';
         } elseif ($application->certificate_status === 'draft') {
             $updateData['certificate_status'] = 'under_review';
         }
 
         $application->update($updateData);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم الحفظ تلقائياً',
+                'certificate_status' => $application->certificate_status
+            ]);
+        }
 
         return back()->with('success', 'تم تحديث بيانات التتبع بنجاح. يمكنك الآن معاينة الشهادة أو اعتمادها.');
     }

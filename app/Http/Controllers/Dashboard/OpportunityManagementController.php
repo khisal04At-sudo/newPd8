@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Opportunity;
 use App\Models\City;
 use App\Models\Application;
+use App\Models\Notification;
+use App\Models\UserInterest;
+use App\Models\User;
 use App\Helpers\FileUploadHelper;
 use App\Services\CertificateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 class OpportunityManagementController extends Controller
 {
@@ -160,7 +164,35 @@ class OpportunityManagementController extends Controller
 
         $message = $status == 1 ? 'تمت إضافة ونشر الفرصة بنجاح.' : 'تمت إضافة الفرصة بنجاح وهي بانتظار مراجعة الإدارة.';
 
+        // إشعار ذكي: أرسل إشعاراً للمستخدمين المهتمين بهذه الفئة
+        if ($status == 1) {
+            $this->notifyInterestedUsers($opportunity);
+        }
+
         return redirect()->route('organization.opportunities.index')->with('success', $message);
+    }
+
+    /**
+     * Send notifications to users interested in the same opportunity category.
+     */
+    private function notifyInterestedUsers(Opportunity $opportunity): void
+    {
+        $interestedUserIds = UserInterest::where('category', $opportunity->category)
+            ->pluck('user_id');
+
+        foreach ($interestedUserIds as $userId) {
+            // Don't notify the organization owner themselves
+            if ($userId === Auth::id()) continue;
+
+            Notification::create([
+                'user_id' => $userId,
+                'title'   => '✨ فرصة مقترحة لك',
+                'message' => 'تم نشر فرصة جديدة في مجال "' . $opportunity->category . '": ' . $opportunity->title,
+                'type'    => 'suggested_opportunity',
+                'data'    => json_encode(['opportunity_id' => $opportunity->id]),
+                'is_read' => false,
+            ]);
+        }
     }
 
     public function edit(Opportunity $opportunity)

@@ -61,7 +61,11 @@ class Certificate extends Model
      */
     public function getDownloadUrlAttribute()
     {
-        if (!$this->is_downloadable || !$this->file) {
+        if (!$this->is_downloadable) {
+            return null;
+        }
+
+        if (!$this->file && !$this->file_url) {
             return null;
         }
 

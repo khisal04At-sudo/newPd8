@@ -52,7 +52,7 @@ class UserManagementController extends Controller
      */
     public function show($userId)
     {
-        $user = User::with(['city', 'certificates.file', 'skills', 'files', 'applications', 'achievements'])
+        $user = User::with(['city', 'certificates.file', 'interests', 'files', 'applications', 'achievements'])
             ->findOrFail($userId);
 
         // Get user statistics

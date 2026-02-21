@@ -117,7 +117,13 @@
                         <td style="padding: 1.5rem;">
                             <div style="display: flex; align-items: center; gap: 1rem;">
                                 <div style="position: relative;">
-                                    <img src="{{ $app->user->avatar_url ?? asset('assets/default-avatar.png') }}" style="width: 48px; height: 48px; border-radius: 1rem; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                                    @php $avatarUrl = $app->user->avatar_url ?? asset('assets/default-avatar.png'); @endphp
+                                    <img src="{{ $avatarUrl }}" 
+                                         style="width: 48px; height: 48px; border-radius: 1rem; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s;"
+                                         onclick="openPhotoModal('{{ $avatarUrl }}', '{{ $app->user->name }}')" 
+                                         onmouseover="this.style.transform='scale(1.1)'"
+                                         onmouseout="this.style.transform='scale(1)'"
+                                         title="انقر لعرض الصورة">
                                     @if($app->user->is_verified)
                                     <div style="position: absolute; bottom: -2px; right: -2px; background: #3b82f6; color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; border: 2px solid white;">
                                         <i class="fas fa-check"></i>
@@ -142,13 +148,28 @@
                             </div>
                         </td>
                         <td style="padding: 1.5rem;">
-                            @if($app->resum_file_id)
-                               <a href="{{ asset($app->resumFile->file_url ?? '#') }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #f1f5f9; color: #475569; padding: 0.4rem 0.8rem; border-radius: 0.75rem; text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#3b82f6'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#475569'">
-                                   <i class="fas fa-file-pdf"></i> السيرة الذاتية
-                               </a>
-                            @else
-                               <span style="color: #cbd5e1; font-size: 0.85rem; font-style: italic;">لا توجد مرفقات</span>
-                            @endif
+                            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                @if($app->resum_file_id && $app->resumFile)
+                                    <a href="{{ route('files.view', $app->resumFile) }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; gap: 0.5rem; background: #eff6ff; color: #3b82f6; padding: 0.4rem 0.85rem; border-radius: 0.75rem; text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: all 0.2s; border: 1px solid #dbeafe;"
+                                       onmouseover="this.style.background='#dbeafe'"
+                                       onmouseout="this.style.background='#eff6ff'">
+                                        <i class="fas fa-file-pdf"></i> السيرة الذاتية
+                                    </a>
+                                @endif
+                                @if($app->cover_letter)
+                                    <button type="button"
+                                            onclick="openCoverLetterModal('{{ $app->user->name }}', {{ json_encode($app->cover_letter) }})"
+                                            style="display: inline-flex; align-items: center; gap: 0.5rem; background: #fdf4ff; color: #9333ea; padding: 0.4rem 0.85rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 700; border: 1px solid #e9d5ff; cursor: pointer; transition: all 0.2s; font-family: 'Cairo', sans-serif;"
+                                            onmouseover="this.style.background='#e9d5ff'"
+                                            onmouseout="this.style.background='#fdf4ff'">
+                                        <i class="fas fa-envelope-open-text"></i> رسالة التغطية
+                                    </button>
+                                @endif
+                                @if(!($app->resum_file_id && $app->resumFile) && !$app->cover_letter)
+                                    <span style="color: #cbd5e1; font-size: 0.85rem; font-style: italic;">لا توجد مرفقات</span>
+                                @endif
+                            </div>
                         </td>
                         <td style="padding: 1.5rem;">
                             @php
@@ -215,9 +236,54 @@
     @endif
 </div>
 
+{{-- Cover Letter Modal --}}
+<div id="coverLetterModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;" onclick="closeCoverLetterModal()">
+    <div style="background: white; border-radius: 1.5rem; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.3); overflow: hidden;" onclick="event.stopPropagation()">
+        {{-- Modal Header --}}
+        <div style="background: linear-gradient(135deg, #9333ea, #7c3aed); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; color: white;">
+                <i class="fas fa-envelope-open-text" style="font-size: 1.2rem;"></i>
+                <div>
+                    <div style="font-weight: 800; font-size: 1.05rem;">رسالة التغطية</div>
+                    <div id="coverLetterApplicantName" style="font-size: 0.85rem; opacity: 0.85;"></div>
+                </div>
+            </div>
+            <button onclick="closeCoverLetterModal()" style="background: rgba(255,255,255,0.2); color: white; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {{-- Modal Body --}}
+        <div style="padding: 2rem; overflow-y: auto; flex: 1;">
+            <div id="coverLetterContent" style="background: #fdf4ff; border: 1px solid #e9d5ff; border-radius: 1rem; padding: 1.5rem; color: #1e293b; font-size: 0.95rem; line-height: 2; white-space: pre-wrap; font-family: 'Cairo', sans-serif; border-right: 4px solid #9333ea;"></div>
+        </div>
+        {{-- Modal Footer --}}
+        <div style="padding: 1rem 2rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-left;">
+            <button onclick="closeCoverLetterModal()" style="background: #f1f5f9; color: #64748b; border: none; padding: 0.6rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Cairo', sans-serif;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">إغلاق</button>
+        </div>
+    </div>
+</div>
 
+{{-- Photo Lightbox Modal --}}
+<div id="photoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; animation: fadeInModal 0.2s ease-out;" onclick="closePhotoModal()">
+    <div style="position: relative; max-width: 480px; width: 90%; text-align: center;" onclick="event.stopPropagation()">
+        {{-- Close Button --}}
+        <button onclick="closePhotoModal()" style="position: absolute; top: -40px; left: 0; background: rgba(255,255,255,0.2); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            <i class="fas fa-times"></i>
+        </button>
+        {{-- User Name --}}
+        <div id="photoModalName" style="color: white; font-weight: 800; font-size: 1.1rem; margin-bottom: 1rem; font-family: 'Cairo', sans-serif;"></div>
+        {{-- Photo --}}
+        <img id="photoModalImg" src="" alt="" style="width: 100%; max-width: 380px; height: 380px; object-fit: cover; border-radius: 1.5rem; box-shadow: 0 25px 60px rgba(0,0,0,0.5); border: 4px solid rgba(255,255,255,0.15);">
+        <div style="margin-top: 0.75rem; color: rgba(255,255,255,0.5); font-size: 0.8rem;">انقر خارج الصورة للإغلاق · ESC</div>
+    </div>
+</div>
 
 <style>
+    @keyframes fadeInModal {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
     @keyframes modalSlideIn {
         from {
             opacity: 0;
@@ -286,6 +352,35 @@
 </style>
 
 <script>
+    // Cover Letter Modal
+    function openCoverLetterModal(name, content) {
+        document.getElementById('coverLetterApplicantName').textContent = 'المتقدم: ' + name;
+        document.getElementById('coverLetterContent').textContent = content;
+        document.getElementById('coverLetterModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCoverLetterModal() {
+        document.getElementById('coverLetterModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Photo Lightbox
+    function openPhotoModal(url, name) {
+        document.getElementById('photoModalImg').src = url;
+        document.getElementById('photoModalName').textContent = name;
+        const modal = document.getElementById('photoModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closePhotoModal() {
+        document.getElementById('photoModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePhotoModal();
+    });
+
     // Dropdown functionality
     function toggleDropdown() {
         const dropdown = document.getElementById('opportunitiesDropdown');

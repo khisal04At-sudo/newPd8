@@ -52,11 +52,8 @@
                         </div>
 
                         <div style="display: flex; gap: 1rem;">
-                            <a href="{{ Storage::url($cert->file_url) }}" target="_blank" style="flex: 1; text-align: center; padding: 0.85rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 0.85rem; font-weight: 800; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
-                                <i class="fas fa-eye" style="margin-left: 0.5rem;"></i> معاينة
-                            </a>
-                            <a href="{{ Storage::url($cert->file_url) }}" download style="padding: 0.85rem; background: #f1f5f9; color: #64748b; text-decoration: none; border-radius: 0.85rem; font-weight: 800; font-size: 0.9rem; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#1e293b'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">
-                                <i class="fas fa-download"></i>
+                            <a href="{{ route('certificates.download', $cert->id) }}" style="flex: 1; text-align: center; padding: 0.85rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 0.85rem; font-weight: 800; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+                                <i class="fas fa-download" style="margin-left: 0.5rem;"></i> تحميل الشهادة
                             </a>
                         </div>
                     </div>

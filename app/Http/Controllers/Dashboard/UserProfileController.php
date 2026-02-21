@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Models\UserInterest;
 use Illuminate\Support\Facades\Auth;
+
 
 class UserProfileController extends Controller
 {
@@ -14,7 +15,7 @@ class UserProfileController extends Controller
      */
     public function show()
     {
-        $user = Auth::user()->load(['skills', 'city', 'certificates.file']);
+        $user = Auth::user()->load(['interests', 'city', 'certificates.file']);
         return view('dashboard.profile.show', compact('user'));
     }
 
@@ -25,7 +26,9 @@ class UserProfileController extends Controller
     {
         $user = Auth::user()->load('city');
         $cities = \App\Models\City::all();
-        return view('dashboard.profile.edit', compact('user', 'cities'));
+        $categories = UserInterest::$categories;
+        $userInterests = $user->interests()->pluck('category')->toArray();
+        return view('dashboard.profile.edit', compact('user', 'cities', 'categories', 'userInterests'));
     }
 
     /**
@@ -43,6 +46,7 @@ class UserProfileController extends Controller
             'birth_date' => ['nullable', 'date'],
             'gender' => ['nullable', 'in:ذكر,أنثى'],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
         ]);
 
         $user->update($request->only(['name', 'bio', 'city_id', 'phone', 'birth_date', 'gender']));
@@ -65,6 +69,37 @@ class UserProfileController extends Controller
                 'file_size' => $file->getSize(),
                 'file_category' => 'avatar',
             ]);
+        }
+
+        if ($request->hasFile('cv')) {
+            // Delete old cv if exists
+            $oldCv = $user->files()->where('file_category', 'cv')->first();
+            if ($oldCv) {
+                $oldCv->deleteFile();
+            }
+
+            $file = $request->file('cv');
+            $path = $file->store('users/cvs', 'public');
+
+            \App\Models\File::create([
+                'user_id' => $user->id,
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientOriginalExtension(),
+                'file_url' => $path,
+                'file_size' => $file->getSize(),
+                'file_category' => 'cv',
+            ]);
+        }
+
+        // Save Interests
+        $user->interests()->delete();
+        if ($request->has('interests') && is_array($request->interests)) {
+            $validCategories = array_keys(UserInterest::$categories);
+            foreach ($request->interests as $category) {
+                if (in_array($category, $validCategories)) {
+                    UserInterest::create(['user_id' => $user->id, 'category' => $category]);
+                }
+            }
         }
 
         return redirect()->route('dashboard.profile')->with('success', 'تم تحديث الملف الشخصي بنجاح');

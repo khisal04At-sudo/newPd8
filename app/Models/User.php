@@ -77,9 +77,9 @@ class User extends Authenticatable
         return $this->hasMany(File::class);
     }
 
-    public function skills()
+    public function interests()
     {
-        return $this->hasMany(UserSkill::class);
+        return $this->hasMany(UserInterest::class);
     }
 
     public function certificates()
@@ -140,7 +140,10 @@ class User extends Authenticatable
             return true;
         }
 
-        return Carbon::now()->diffInSeconds($this->last_otp_sent_at) >= 60;
+        // Use a signed diff: positive means last_otp_sent_at is in the past
+        $secondsPassed = Carbon::parse($this->last_otp_sent_at)->diffInSeconds(Carbon::now(), false);
+
+        return $secondsPassed >= 60;
     }
 
     /**

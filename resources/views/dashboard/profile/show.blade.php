@@ -95,17 +95,25 @@
                 @endif
             </div>
 
-            <!-- Skills Section -->
+            <!-- Interests Section -->
             <div class="glass-card" style="padding: 1.5rem; border-radius: 1.5rem;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 1.25rem;">المهارات</h3>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 1.25rem;">🎯 الاهتمامات</h3>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                    @forelse($user->skills as $skill)
-                        <div style="background: white; border: 1px solid #e2e8f0; padding: 0.5rem 0.85rem; border-radius: 0.75rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;" title="{{ $skill->proficiency_label }}">
-                            <span style="font-weight: 700; color: #1e293b;">{{ $skill->skill_name }}</span>
-                            <div style="width: 8px; height: 8px; border-radius: 50%; background: {{ $skill->proficiency_color == 'blue' ? '#3b82f6' : ($skill->proficiency_color == 'green' ? '#10b981' : ($skill->proficiency_color == 'purple' ? '#8b5cf6' : '#94a3b8')) }};"></div>
+                    @php
+                        $allCategories = \App\Models\UserInterest::$categories;
+                    @endphp
+                    @forelse($user->interests as $interest)
+                        @php $info = $allCategories[$interest->category] ?? ['icon' => 'fas fa-star', 'color' => '#94a3b8']; @endphp
+                        <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 2rem; background: color-mix(in srgb, {{ $info['color'] }} 12%, white); border: 1.5px solid color-mix(in srgb, {{ $info['color'] }} 40%, white); color: {{ $info['color'] }}; font-size: 0.85rem; font-weight: 700;">
+                            @if(str_contains($info['icon'], '/'))
+                                <img src="{{ asset($info['icon']) }}" style="width: 1.25rem; height: 1.25rem; object-fit: contain;">
+                            @else
+                                <i class="{{ $info['icon'] }}"></i>
+                            @endif
+                            <span>{{ $interest->category }}</span>
                         </div>
                     @empty
-                        <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; width: 100%;">لم يتم إضافة مهارات</p>
+                        <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; width: 100%;">لم يتم تحديد الاهتمامات بعد</p>
                     @endforelse
                 </div>
             </div>
@@ -135,8 +143,8 @@
                             <div style="flex: 1;">
                                 <div style="font-weight: 800; color: #1e293b; font-size: 0.95rem; margin-bottom: 0.25rem;">{{ $cert->title }}</div>
                                 <div style="font-size: 0.8rem; color: #94a3b8;">{{ $cert->issue_date->translatedFormat('d F Y') }}</div>
-                                @if($cert->file)
-                                <a href="{{ asset($cert->file->file_url) }}" target="_blank" style="margin-top: 0.5rem; display: inline-flex; align-items: center; font-size: 0.8rem; color: #4f46e5; font-weight: 700; text-decoration: none;">
+                                @if($cert->file || $cert->file_url)
+                                <a href="{{ route('certificates.download', $cert->id) }}" style="margin-top: 0.5rem; display: inline-flex; align-items: center; font-size: 0.8rem; color: #4f46e5; font-weight: 700; text-decoration: none;">
                                     تحميل الشهادة <i class="fas fa-download mr-1" style="font-size: 0.7rem;"></i>
                                 </a>
                                 @endif

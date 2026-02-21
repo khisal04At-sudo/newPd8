@@ -47,24 +47,21 @@
                             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <input type="number" name="attended_hours" value="{{ $app->attended_hours }}" min="0" max="{{ $opportunity->total_hours }}"
-                                           form="tracking-form-{{ $app->id }}"
+                                           form="tracking-form-{{ $app->id }}" class="auto-save-input"
                                            style="width: 70px; padding: 0.4rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: 'Cairo', sans-serif; font-weight: 700;">
                                     <span style="color: #64748b; font-size: 0.75rem;">/ {{ $opportunity->total_hours }} ساعة</span>
                                 </div>
-                                <select name="commitment_score" form="tracking-form-{{ $app->id }}" 
-                                        style="width: 130px; padding: 0.4rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.85rem;">
-                                    <option value="">درجة الالتزام</option>
-                                    @for($i=5; $i>=1; $i--)
-                                        <option value="{{ $i }}" {{ $app->commitment_score == $i ? 'selected' : '' }}>
-                                            {{ $i }} {{ $i >= 3 ? '⭐' : '⭐' }}
-                                        </option>
-                                    @endfor
-                                </select>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="number" name="commitment_score" value="{{ $app->commitment_score }}" min="0" max="100"
+                                           form="tracking-form-{{ $app->id }}" class="auto-save-input" placeholder="الالتزام 100"
+                                           style="width: 80px; padding: 0.4rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 0.85rem;">
+                                    <span style="color: #64748b; font-size: 0.75rem;">%</span>
+                                </div>
                             </div>
                         </td>
                         <td style="padding: 1.5rem;">
                             <input type="text" name="certificate_name" value="{{ $app->certificate_name ?: $app->user->name }}" 
-                                   form="tracking-form-{{ $app->id }}" placeholder="الاسم في الشهادة"
+                                   form="tracking-form-{{ $app->id }}" placeholder="الاسم في الشهادة" class="auto-save-input"
                                    style="width: 100%; min-width: 150px; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; font-family: 'Cairo', sans-serif; font-weight: 700; color: #3b82f6;">
                         </td>
                         <td style="padding: 1.5rem;">
@@ -78,7 +75,7 @@
                                 ];
                                 $current = $statusMap[$cStatus] ?? $statusMap['draft'];
                             @endphp
-                            <span style="background: {{ $current['bg'] }}; color: {{ $current['color'] }}; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid {{ $current['color'] }}20;">
+                            <span id="status-badge-{{ $app->id }}" style="background: {{ $current['bg'] }}; color: {{ $current['color'] }}; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid {{ $current['color'] }}20;">
                                 <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
                                 {{ $current['label'] }}
                             </span>
@@ -86,10 +83,9 @@
                         <td style="padding: 1.5rem; text-align: center;">
                             <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
                                 <div style="display: flex; gap: 0.4rem;">
-                                    <button type="submit" form="tracking-form-{{ $app->id }}" title="حفظ البيانات"
-                                            style="background: #ffffff; color: #334155; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer;">
-                                        <i class="fas fa-save"></i>
-                                    </button>
+                                    <div id="save-indicator-{{ $app->id }}" style="display: none; color: #16a34a; font-size: 0.8rem; font-weight: 700;">
+                                        <i class="fas fa-check-circle"></i> تم الحفظ
+                                    </div>
                                     <a href="{{ route('organization.applications.certificate.preview', $app) }}" target="_blank" title="معاينة"
                                        style="background: #ffffff; color: #2563eb; border: 1px solid #dbeafe; padding: 0.5rem; border-radius: 0.5rem; text-decoration: none;">
                                         <i class="fas fa-eye"></i>
@@ -128,4 +124,81 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.auto-save-input');
+        let timeouts = {};
+
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const appId = this.getAttribute('form').split('-').pop();
+                
+                clearTimeout(timeouts[appId]);
+                
+                timeouts[appId] = setTimeout(() => {
+                    saveTrackingData(appId);
+                }, 1000); // Save after 1 second of inactivity
+            });
+        });
+
+        async function saveTrackingData(appId) {
+            const form = document.getElementById(`tracking-form-${appId}`);
+            const formData = new FormData(form);
+            const indicator = document.getElementById(`save-indicator-${appId}`);
+            const badge = document.getElementById(`status-badge-${appId}`);
+
+            // Gather values from inputs associated with this form
+            const relatedInputs = document.querySelectorAll(`[form="tracking-form-${appId}"]`);
+            relatedInputs.forEach(input => {
+                if (input.name) {
+                    formData.append(input.name, input.value);
+                }
+            });
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    indicator.style.display = 'block';
+                    setTimeout(() => {
+                        indicator.style.display = 'none';
+                    }, 3000);
+
+                    // Update status badge if changed
+                    if (data.certificate_status) {
+                        updateStatusBadge(appId, data.certificate_status);
+                    }
+                }
+            } catch (error) {
+                console.error('Error auto-saving:', error);
+            }
+        }
+
+        function updateStatusBadge(appId, status) {
+            const badge = document.getElementById(`status-badge-${appId}`);
+            const statusMap = {
+                'draft': { label: 'مسودة', color: '#64748b', bg: '#f1f5f9' },
+                'under_review': { label: 'قيد المراجعة', color: '#2563eb', bg: '#eff6ff' },
+                'approved': { label: 'معتمدة', color: '#16a34a', bg: '#f0fdf4' },
+                'rejected': { label: 'مرفوضة', color: '#dc2626', bg: '#fef2f2' }
+            };
+            const current = statusMap[status] || statusMap['draft'];
+            
+            badge.style.background = current.bg;
+            badge.style.color = current.color;
+            badge.style.borderColor = current.color + '20';
+            badge.innerHTML = `<i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${current.label}`;
+        }
+    });
+</script>
 @endsection

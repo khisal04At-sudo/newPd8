@@ -50,7 +50,27 @@
                         <textarea name="bio" rows="4" 
                                   style="width: 100%; padding: 1rem 1.25rem; border: 1px solid #e2e8f0; border-radius: 1rem; outline: none; font-size: 1rem; resize: vertical; transition: border-color 0.2s;" 
                                   onfocus="this.style.borderColor='#4f46e5'" onblur="this.style.borderColor='#e2e8f0'"
-                                  placeholder="أخبرنا قليلاً عن نفسك، خبراتك، وما تطمح لتحقيقه من خلال التطوع...">{{ old('bio', $user->bio) }}</textarea>
+                        placeholder="أخبرنا قليلاً عن نفسك، خبراتك، وما تطمح لتحقيقه من خلال التطوع...">{{ old('bio', $user->bio) }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 0.6rem; color: #475569; font-weight: 700; font-size: 0.9rem;">السيرة الذاتية (CV)</label>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <input type="file" name="cv" id="cvInput" class="form-control" accept=".pdf,.doc,.docx"
+                                   style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s;">
+                            
+                            @php
+                                $cvFile = $user->files()->where('file_category', 'cv')->first();
+                            @endphp
+                            
+                            @if($cvFile)
+                                <a href="{{ asset($cvFile->file_url) }}" target="_blank" 
+                                   style="display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; padding: 0.75rem 1rem; background: #eff6ff; color: #3b82f6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;">
+                                    <i class="fas fa-file-download"></i> عرض الحالي
+                                </a>
+                            @endif
+                        </div>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">PDF, DOC, DOCX - بحد أقصى 5 ميجابايت</p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
@@ -88,6 +108,32 @@
                                     <i class="fas fa-venus text-pink-500"></i> أنثى
                                 </label>
                             </div>
+                        </div>
+                    </div>
+
+                    {{-- Interests Section --}}
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 0.4rem; color: #475569; font-weight: 700; font-size: 0.9rem;">🎯 الاهتمامات</label>
+                        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.85rem;">اختر المجالات التي تهتم بها لتصلك فرص مقترحة</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem;">
+                            @foreach($categories as $name => $info)
+                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.85rem; border: 1.5px solid {{ in_array($name, $userInterests) ? $info['color'] : '#e2e8f0' }}; border-radius: 0.75rem; cursor: pointer; font-size: 0.85rem; font-weight: 700; background: {{ in_array($name, $userInterests) ? 'color-mix(in srgb, '.$info['color'].' 10%, white)' : 'white' }}; color: {{ in_array($name, $userInterests) ? $info['color'] : '#475569' }}; transition: all 0.2s;"
+                                      onmouseover="this.style.borderColor='{{ $info['color'] }}'"
+                                      onmouseout="if(!this.querySelector('input').checked) { this.style.borderColor='#e2e8f0'; this.style.background='white'; this.style.color='#475569'; }">
+                                    <input type="checkbox" name="interests[]" value="{{ $name }}"
+                                           {{ in_array($name, $userInterests) ? 'checked' : '' }}
+                                           onchange="toggleInterest(this, '{{ $info['color'] }}')"
+                                           style="display: none;">
+                                    <span>
+                                        @if(str_contains($info['icon'], '/'))
+                                            <img src="{{ asset($info['icon']) }}" style="width: 1rem; height: 1rem; object-fit: contain;">
+                                        @else
+                                            <i class="{{ $info['icon'] }}"></i>
+                                        @endif
+                                    </span>
+                                    <span>{{ $name }}</span>
+                                </label>
+                            @endforeach
                         </div>
                     </div>
 
@@ -133,6 +179,19 @@
 
     // Initial style call
     document.addEventListener('DOMContentLoaded', updateGenderStyles);
+
+    function toggleInterest(checkbox, color) {
+        const label = checkbox.closest('label');
+        if (checkbox.checked) {
+            label.style.borderColor = color;
+            label.style.background = `color-mix(in srgb, ${color} 10%, white)`;
+            label.style.color = color;
+        } else {
+            label.style.borderColor = '#e2e8f0';
+            label.style.background = 'white';
+            label.style.color = '#475569';
+        }
+    }
 </script>
 
 <style>

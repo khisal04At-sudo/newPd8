@@ -121,7 +121,11 @@ class OtpVerificationController extends Controller
 
         // Check resend cooldown
         if (!$user->canResendOtp()) {
-            $secondsRemaining = 60 - Carbon::now()->diffInSeconds($user->last_otp_sent_at);
+            $lastSent = Carbon::parse($user->last_otp_sent_at);
+            $secondsPassed = $lastSent->diffInSeconds(Carbon::now(), false);
+            // diffInSeconds with false = signed: negative means last_otp_sent_at is in the future (timezone bug)
+            // In any case, cap at 0 minimum
+            $secondsRemaining = max(0, 60 - max(0, $secondsPassed));
             return response()->json([
                 'success' => false,
                 'message' => "الرجاء الانتظار {$secondsRemaining} ثانية قبل إعادة الإرسال",
@@ -132,11 +136,11 @@ class OtpVerificationController extends Controller
         // Generate new OTP
         $otpCode = rand(100000, 999999);
 
-        // Update user with new OTP
-        $user->update([
+        // Update user with new OTP using DB directly to avoid model cache issues
+        \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
             'otp_code' => $otpCode,
-            'otp_expires_at' => now()->addMinutes(5),
-            'last_otp_sent_at' => now(),
+            'otp_expires_at' => now()->addMinutes(5)->toDateTimeString(),
+            'last_otp_sent_at' => now()->toDateTimeString(),
         ]);
 
         // تحديث كائن المستخدم من قاعدة البيانات للتأكد من الحفظ

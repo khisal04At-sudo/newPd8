@@ -38,7 +38,7 @@ class VolunteerRegisterController extends Controller
             'password'    => ['required', 'confirmed', Rules\Password::defaults()],
             'city_id'     => ['required', 'exists:cities,id'],
             'gender'      => ['required', 'in:ذكر,أنثى'],
-            'birth_date'  => ['required', 'date', 'before:today'],
+            'birth_date'  => ['required', 'date', 'before:' . now()->subYears(7)->toDateString()],
         ], [
             'name.required' => 'الاسم مطلوب',
             'email.required' => 'البريد الإلكتروني مطلوب',
@@ -48,7 +48,7 @@ class VolunteerRegisterController extends Controller
             'city_id.required' => 'المدينة مطلوبة',
             'gender.required' => 'الجنس مطلوب',
             'birth_date.required' => 'تاريخ الميلاد مطلوب',
-            'birth_date.before' => 'تاريخ الميلاد غير صحيح',
+            'birth_date.before' => 'يجب أن يكون عمرك 7 سنوات أو أكثر',
         ]);
 
         // توليد OTP

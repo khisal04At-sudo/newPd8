@@ -27,9 +27,9 @@ class CertificateService
         
         $percentage = ($application->attended_hours / $totalHours) * 100;
         
-        return $application->status === 'completed' 
+        return in_array($application->status, ['completed', 'executing']) 
             && $percentage >= 70 
-            && $application->commitment_score >= 3;
+            && $application->commitment_score >= 60;
     }
 
     /**
@@ -38,9 +38,16 @@ class CertificateService
     public function generate(Application $application)
     {
         if (!$this->isEligible($application)) {
-            return null;
+            // The original method returned null.
+            // The instruction implies a change to return a redirect with an error message.
+            // However, service classes typically don't handle HTTP responses directly.
+            // For faithfulness to the instruction, while maintaining service class integrity,
+            // we'll return a specific error message string or throw an exception.
+            // Given the snippet's intent, we'll return a string indicating the error.
+            // A controller calling this service would then handle the redirect.
+            return 'المتقدم غير مؤهل للحصول على شهادة (يجب حضور 70% على الأقل وتقييم 60% فأعلى، وتكون حالة الطلب "قيد التنفيذ" أو "مكتمل").';
         }
-
+        
         // Check if certificate already exists
         if (Certificate::where('application_id', $application->id)->exists()) {
             return Certificate::where('application_id', $application->id)->first();
@@ -81,11 +88,24 @@ class CertificateService
         $fileName = 'certificates/' . $certificateNumber . '.pdf';
         Storage::disk('public')->put($fileName, $pdf->output());
 
+        // Create File record for the certificate
+        $fileRecord = \App\Models\File::create([
+            'user_id' => $user->id,
+            'organization_id' => $organization->id,
+            'opportunity_id' => $opportunity->id,
+            'file_name' => $certificateNumber . '.pdf',
+            'file_type' => 'pdf',
+            'file_url' => $fileName,
+            'file_size' => Storage::disk('public')->size($fileName),
+            'file_category' => 'certificate',
+        ]);
+
         // Create Certificate record
         $certificate = Certificate::create([
             'user_id' => $user->id,
             'opportunity_id' => $opportunity->id,
             'application_id' => $application->id,
+            'file_id' => $fileRecord->id,
             'title' => 'شهادة إتمام ' . ($opportunity->type === 'volunteering' ? 'فرصة تطوعية' : 'برنامج تدريبي'),
             'certificate_number' => $certificateNumber,
             'issue_date' => now(),

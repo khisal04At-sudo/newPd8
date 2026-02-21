@@ -49,6 +49,49 @@ Route::middleware('auth')->group(function () {
     Route::get('/opportunities/{opportunity}/apply-form', [\App\Http\Controllers\ApplicationController::class, 'create'])->name('applications.create');
     Route::post('/opportunities/{opportunity}/submit-application', [\App\Http\Controllers\ApplicationController::class, 'store'])->name('applications.store');
     Route::delete('/applications/{application}/withdraw', [\App\Http\Controllers\ApplicationController::class, 'withdraw'])->name('applications.withdraw');
+
+    // Secure File Serving Route
+    Route::get('/files/{file}/view', function (\App\Models\File $file) {
+        $url = $file->file_url;
+
+        // Normalize: remove 'storage/' prefix if present, use public disk
+        $path = str_starts_with($url, 'storage/') ? substr($url, 8) : $url;
+
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return response()->file(
+            \Illuminate\Support\Facades\Storage::disk('public')->path($path)
+        );
+    })->name('files.view');
+
+    Route::get('/files/{file}/download', function (\App\Models\File $file) {
+        $url = $file->file_url;
+        $path = str_starts_with($url, 'storage/') ? substr($url, 8) : $url;
+        
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->download($path, $file->file_name);
+    })->name('files.download');
+
+    Route::get('/certificates/{certificate}/download', function (\App\Models\Certificate $certificate) {
+        if (!$certificate->is_downloadable || (!$certificate->file_url && !$certificate->file)) {
+            abort(404, 'الشهادة غير متاحة للتحميل حالياً.');
+        }
+
+        $url = $certificate->file ? $certificate->file->file_url : $certificate->file_url;
+        $path = str_starts_with($url, 'storage/') ? substr($url, 8) : $url;
+
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            abort(404, 'ملف الشهادة غير موجود.');
+        }
+
+        $fileName = ($certificate->certificate_number ?: 'certificate') . '.pdf';
+        return \Illuminate\Support\Facades\Storage::disk('public')->download($path, $fileName);
+    })->name('certificates.download');
 });
 
 // Route::middleware('auth')->group(function () {

@@ -15,7 +15,7 @@ class ProfileController extends Controller
      */
     public function showUser($userId)
     {
-        $user = User::with(['city', 'certificates.file', 'skills', 'files'])->findOrFail($userId);
+        $user = User::with(['city', 'certificates.file', 'interests', 'files'])->findOrFail($userId);
         
         // Get user statistics
         $stats = [

@@ -103,10 +103,12 @@
                                     @endif
                                 </div>
                             </div>
-                            @if($cert->file_url)
-                                <a href="{{ Storage::url($cert->file_url) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #3b82f6; color: white; padding: 0.6rem 1.25rem; border-radius: 0.75rem; text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; width: 100%; justify-content: center;" onmouseover="this.style.background='#2563eb'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#3b82f6'; this.style.transform='none'">
-                                    <i class="fas fa-eye"></i> عرض الشهادة
+                            @if($cert->file_url || $cert->file)
+                            <div style="display: flex; gap: 1rem;">
+                                <a href="{{ route('certificates.download', $cert->id) }}" style="flex: 1; text-align: center; padding: 0.85rem; background: #3b82f6; color: white; text-decoration: none; border-radius: 0.85rem; font-weight: 800; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+                                    <i class="fas fa-download" style="margin-left: 0.5rem;"></i> تحميل الشهادة
                                 </a>
+                            </div>
                             @endif
                         </div>
                         @endforeach
