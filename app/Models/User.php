@@ -176,7 +176,18 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         $avatar = $this->getAvatar();
-        return $avatar ? asset($avatar->file_url) : asset('images/default-avatar.png');
+        if ($avatar && $avatar->file_url) {
+            $path = str_starts_with($avatar->file_url, 'storage/') ? substr($avatar->file_url, 8) : $avatar->file_url;
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        }
+
+        // Fallback for organization logo
+        if ($this->user_type === 'organization' && $this->organization && $this->organization->logo_url) {
+            $path = str_starts_with($this->organization->logo_url, 'storage/') ? substr($this->organization->logo_url, 8) : $this->organization->logo_url;
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        }
+
+        return asset('assets/images/logo-removebg-preview.png'); // Use the platform logo as default if no avatar
     }
 
     /**

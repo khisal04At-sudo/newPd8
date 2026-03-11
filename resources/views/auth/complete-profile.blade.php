@@ -6,19 +6,41 @@
     <title>إكمال الملف الشخصي</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
         body {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #fdf2f8 100%);
             min-height: 100vh;
             font-family: 'Cairo', 'Segoe UI', sans-serif;
             display: flex; align-items: center; justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
+        .abstract-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.5;
+            animation: float-slow 25s infinite alternate ease-in-out;
+        }
+        @keyframes float-slow {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.2); }
+        }
+        .shape-1 { width: 500px; height: 500px; background: #10b981; top: -10%;  left: -10%;  }
+        .shape-2 { width: 400px; height: 400px; background: #3b82f6; bottom: -10%; right: -10%; }
         .form-container {
             max-width: 820px; width: 95%;
-            background: white;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
             margin: 30px auto;
+            position: relative;
+            z-index: 10;
         }
         .header { text-align: center; margin-bottom: 2rem; }
         .header h1 { color: #1e293b; font-size: 1.75rem; font-weight: 800; }
@@ -61,12 +83,13 @@
         .interest-card label:hover { border-color: #a5b4fc; background: #f0f4ff; }
 
         .btn-submit {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
             color: white; width: 100%; padding: 1rem;
             border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
             cursor: pointer; transition: transform 0.2s;
+            font-family: inherit;
         }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79,70,229,0.3); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16,185,129,0.3); }
         .avatar-preview { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; margin-bottom: 0.75rem; display: block; }
         .hint { font-size: 0.8rem; color: #94a3b8; margin-top: 0.35rem; }
         .skip-link { display: block; text-align: center; margin-top: 1rem; color: #94a3b8; font-size: 0.9rem; text-decoration: none; }
@@ -74,6 +97,8 @@
     </style>
 </head>
 <body>
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
     <div class="form-container">
         <div class="header">
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👤</div>

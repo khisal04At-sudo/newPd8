@@ -221,3 +221,108 @@
         backdrop-filter: none !important;
     }
 }
+
+/* --- Shared Public Navbar Styles --- */
+.navbar-public {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    height: 80px;
+}
+
+.nav-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.logo-side {
+    justify-content: flex-start;
+}
+
+.links-center {
+    justify-content: center;
+    gap: 2.5rem;
+}
+
+.links-center a {
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+}
+
+.links-center a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #10b981, #3b82f6);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.links-center a:hover {
+    color: #3b82f6;
+}
+
+.links-center a:hover::after {
+    transform: scaleX(1);
+}
+
+.auth-side {
+    justify-content: flex-end;
+}
+
+.btn-auth {
+    padding: 0.6rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.btn-auth.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-auth.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-auth.btn-outline {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+}
+
+.btn-auth.btn-outline:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+@media (max-width: 768px) {
+    .links-center {
+        display: none;
+        /* Hide links on mobile, or move to a drawer if needed */
+    }
+}

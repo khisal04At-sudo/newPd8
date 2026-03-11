@@ -1,10 +1,10 @@
-<div class="sidebar" id="sidebar">
+<div class="sidebar {{ (request()->is('dashboard*') || request()->is('volunteer*') || request()->is('organization/*') || request()->is('admin*')) ? '' : 'collapsed' }}" id="sidebar">
     <div class="sidebar-header">
         <h3>منصة التطوع</h3>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="{{ url('/') }}"><i class="fas fa-globe"></i> الواجهة الرئيسية</a></li>
         @auth
+
             <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="fas fa-home"></i> الرئيسية</a></li>
             <li><a href="{{ route('dashboard.profile') }}" class="{{ request()->routeIs('dashboard.profile') ? 'active' : '' }}"><i class="fas fa-user"></i> البروفايل</a></li>
             <li><a href="{{ route('dashboard.opportunities') }}" class="{{ request()->routeIs('dashboard.opportunities') ? 'active' : '' }}"><i class="fas fa-briefcase"></i> الفرص التطوعية</a></li>
@@ -100,12 +100,6 @@
         .sidebar.show {
             transform: translateX(0);
         }
-    }
-    .shifted {
-        margin-right: 260px !important;
-    }
-    .expanded {
-        margin-right: 0 !important;
     }
     .main-content {
         transition: all 0.3s ease;

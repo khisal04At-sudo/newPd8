@@ -25,102 +25,6 @@
         }
 
         /* --- Header --- */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            text-decoration: none;
-            color: var(--primary);
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-        .logo-area i { font-size: 1.8rem; }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .nav-links a:hover { color: var(--primary); }
-
-        .search-bar {
-            background: #f1f5f9;
-            border-radius: 999px;
-            padding: 0.5rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: 300px;
-        }
-        .search-bar input {
-            background: none;
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 0.9rem;
-        }
-
-        .auth-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.6rem 1.5rem;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
-        }
-        .btn-primary:hover { 
-            transform: translateY(-3px) scale(1.02); 
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5); 
-        }
-        .btn-outline {
-            background: white;
-            border: 2px solid #e2e8f0;
-            color: var(--text-muted);
-        }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-        }
         .avatar {
             width: 40px;
             height: 40px;
@@ -361,38 +265,7 @@
 @endauth
 
     <div class="main-content" id="mainContent">
-        <nav class="navbar">
-            <div style="display: flex; align-items: center; gap: 1.5rem;">
-                @auth
-                    <button class="toggle-sidebar" onclick="toggleSidebar()" style="background:none; border:none; font-size:1.5rem; color:var(--primary); cursor:pointer; display: flex; align-items: center;">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                @endauth
-                <a href="{{ url('/') }}" class="logo-area">
-                    <i class="fas fa-feather-alt"></i>
-                    أثيرا
-                </a>
-                <div class="nav-links">
-                    <a href="{{ route('opportunities.index') }}">تصفح الفرص</a>
-                    <a href="#">عن المنصة</a>
-                    <a href="#">الشركاء</a>
-                </div>
-            </div>
-
-           
-
-                <div class="auth-actions">
-                    @auth
-                        <div class="user-profile" onclick="toggleSidebar()">
-                            <span style="font-weight: 600;">{{ auth()->user()->name }}</span>
-                            <img src="{{ auth()->user()->avatar_url }}" class="avatar">
-                        </div>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-outline">تسجيل الدخول</a>
-                    <a href="{{ route('choose.account.type') }}" class="btn btn-primary">انضم إلينا</a>
-                @endauth
-            </div>
-        </nav>
+        @include('layouts.partials.public-navbar')
 
         <section class="hero">
             <!-- Background Media Container -->
@@ -412,9 +285,9 @@
             <div class="hero-content">
                 <h1>أثيرا: اصنع أثراً يمتد <br> عبر التطوع والتدريب</h1>
                 <p>بوابتك الذكية لاكتشاف الفرص التي تنمي مهاراتك وتخدم مجتمعك. انضم إلى الآلاف من المتطوعين المبدعين اليوم.</p>
-                <div style="display: flex; gap: 1.5rem; justify-content: center;">
+                <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
                     <a href="{{ route('opportunities.index') }}" class="btn btn-primary" style="padding: 1.2rem 3rem; font-size: 1.1rem;">استكشف الفرص الآن</a>
-                    <a href="#" class="btn btn-outline" style="padding: 1.2rem 3rem; font-size: 1.1rem; border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white;">كيف أبدأ؟</a>
+                    <a href="{{ route('organizations.index') }}" class="btn btn-outline" style="padding: 1.2rem 3rem; font-size: 1.1rem; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(10px);">استكشف المؤسسات</a>
                 </div>
             </div>
         </section>
@@ -485,7 +358,7 @@
         <footer>
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4 style="font-size: 1.5rem; color: #fff;">أثيرا</h4>
+                    <img src="{{ asset('assets/images/logo-removebg-preview.png') }}" alt="أثيرا" style="height: 60px; width: auto; object-fit: contain; margin-bottom: 1.5rem;">
                     <p>منصة ليبية رائدة لتمكين المتطوعين وربطهم بالفرص التنموية والمهنية.</p>
                     <div style="display: flex; gap: 1rem; margin-top: 2rem; font-size: 1.5rem;">
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -524,18 +397,8 @@
                 <p>&copy; 2026 جميع الحقوق محفوظة لمنصة أثيرا التطوعية</p>
             </div>
         </footer>
+        @include('layouts.partials.photo-modal')
     </div>
 
-    <script>
-        @auth
-            document.addEventListener('DOMContentLoaded', () => {
-                // Initial state for landing page should be collapsed sidebar
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
-                if(sidebar) sidebar.classList.add('collapsed');
-                if(mainContent) mainContent.classList.remove('shifted');
-            });
-        @endauth
-    </script>
 </body>
 </html>

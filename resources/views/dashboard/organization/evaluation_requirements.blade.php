@@ -47,8 +47,8 @@
                 <h4 style="font-weight: 800; margin-bottom: 0.5rem; font-size: 1.1rem;">تنبيه هام</h4>
                 <p style="margin: 0; font-size: 0.95rem; opacity: 0.8; line-height: 1.6;">بمجرد حفظ التقييم وتحقق الشروط، سيتم توليد شهادة بصيغة PDF بشكل آلي وتظهر في الملف الشخصي للمتطوع.</p>
             </div>
-            <a href="{{ route('organization.applications.index') }}" style="background: white; color: #1e293b; text-decoration: none; padding: 1rem 2rem; border-radius: 1rem; font-weight: 900; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                اذهب للتقييم الآن
+            <a href="{{ route('organization.opportunities.index') }}" style="background: white; color: #1e293b; text-decoration: none; padding: 1rem 2rem; border-radius: 1rem; font-weight: 900; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                اذهب لإدارة الفرص
             </a>
         </div>
     </div>

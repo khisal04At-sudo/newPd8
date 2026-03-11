@@ -19,6 +19,7 @@ Route::get('/opportunities/{opportunity}', [\App\Http\Controllers\PublicOpportun
 
 // Public Profile Routes
 Route::get('/users/{user}/profile', [\App\Http\Controllers\ProfileController::class, 'showUser'])->name('users.profile');
+Route::get('/organizations', [\App\Http\Controllers\OrganizationDirectoryController::class, 'index'])->name('organizations.index');
 Route::get('/organizations/{organization}/profile', [\App\Http\Controllers\ProfileController::class, 'showOrganization'])->name('organizations.profile');
 
 Route::middleware('auth')->group(function () {
@@ -168,15 +169,19 @@ Route::middleware('auth')->group(function () {
 
         // 2. Manage Opportunities
         Route::resource('opportunities', \App\Http\Controllers\Dashboard\OpportunityManagementController::class);
+        Route::get('/opportunities/{opportunity}/detail', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'show'])->name('opportunities.show');
         Route::post('/opportunities/{opportunity}/start', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'startExecution'])->name('opportunities.start');
         Route::post('/opportunities/{opportunity}/complete', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'completeExecution'])->name('opportunities.complete');
+        Route::post('/opportunities/{opportunity}/pause', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'pauseExecution'])->name('opportunities.pause');
         Route::post('/opportunities/{opportunity}/cancel', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'cancelOpportunity'])->name('opportunities.cancel');
         Route::get('/opportunities/{opportunity}/tracking', [\App\Http\Controllers\Dashboard\OpportunityManagementController::class, 'tracking'])->name('opportunities.tracking');
 
-        // 3. Volunteers / Applications
-        Route::get('/applications', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'index'])->name('applications.index');
+
+
         Route::post('/applications/{application}/status', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateStatus'])->name('applications.updateStatus');
         Route::post('/applications/{application}/tracking', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'updateTracking'])->name('applications.updateTracking');
+        Route::post('/applications/{application}/waitlist', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'addToWaitlist'])->name('applications.waitlist');
+        Route::post('/applications/{application}/promote', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'promoteFromWaitlist'])->name('applications.promote');
         Route::get('/applications/{application}/certificate/preview', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'previewCertificate'])->name('applications.certificate.preview');
         Route::post('/applications/{application}/certificate/issue', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'issueCertificate'])->name('applications.certificate.issue');
         Route::post('/applications/{application}/certificate/reject', [\App\Http\Controllers\Dashboard\ApplicationManagementController::class, 'rejectCertificate'])->name('applications.certificate.reject');

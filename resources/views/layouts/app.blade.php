@@ -12,108 +12,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        :root {
+            --sidebar-width: 260px;
+        }
         body {
             background-color: #f8fafc;
             color: #1e293b;
             margin: 0;
             padding-top: 80px; /* Space for fixed header */
         }
-        .navbar-public {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 1.25rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-        }
-        .nav-links-public {
-            display: flex;
-            gap: 2.5rem;
-        }
-        .nav-links-public a {
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 600;
+        .main-content {
             transition: all 0.3s ease;
-            position: relative;
+            width: 100%;
         }
-        .nav-links-public a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #10b981, #3b82f6);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+        .main-content.shifted {
+            margin-right: var(--sidebar-width) !important;
+            width: calc(100% - var(--sidebar-width)) !important;
         }
-        .nav-links-public a:hover { 
-            color: #3b82f6; 
+        .main-content.expanded {
+            margin-right: 0 !important;
+            width: 100% !important;
         }
-        .nav-links-public a:hover::after {
-            transform: scaleX(1);
-        }
-        .btn-auth {
-            padding: 0.75rem 1.75rem;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-        .logo-link {
-            text-decoration: none;
-            font-size: 1.75rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: linear-gradient(135deg, #10b981 0%, #2563eb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            transition: transform 0.3s ease;
-        }
-        .logo-link:hover {
-            transform: scale(1.05);
+        @media (max-width: 768px) {
+            .main-content.shifted {
+                margin-right: 0 !important;
+                width: 100% !important;
+            }
         }
     </style>
-
 </head>
 <body class="antialiased">
     
-    <!-- simple public navbar if not on landing -->
-    @if(!request()->is('/'))
-    <nav class="navbar-public">
-        <a href="{{ url('/') }}" class="logo-link">
-            <i class="fas fa-feather-alt"></i> أثيرا
-        </a>
-        <div class="nav-links-public">
-            <a href="{{ route('opportunities.index') }}">تصفح الفرص</a>
-            <a href="#">عن المنصة</a>
-            <a href="#">الشركاء</a>
-        </div>
-        <div>
-            @auth
-                <a href="{{ route('dashboard') }}" class="btn-auth btn-brand">
-                    <i class="fas fa-th-large ml-2"></i>
-                    لوحة التحكم
-                </a>
-            @else
-                <a href="{{ route('login') }}" class="btn-auth" style="color: #64748b; border: 2px solid #e2e8f0; background: white;">دخول</a>
-                <a href="{{ route('choose.account.type') }}" class="btn-auth btn-brand">انضمام</a>
-            @endauth
-        </div>
-    </nav>
-    @endif
+    @auth
+        @if(auth()->user()->user_type === 'organization')
+            @include('layouts.partials.organization-sidebar')
+        @else
+            @include('layouts.partials.sidebar')
+        @endif
+    @endauth
+
+    <div class="main-content {{ (request()->is('dashboard*') || request()->is('volunteer*') || request()->is('organization/*') || request()->is('admin*')) ? 'shifted' : 'expanded' }}" id="mainContent">
+        <!-- Shared Navigation -->
+        @if(!request()->is('login') && !request()->is('register') && !request()->is('choose-account-type'))
+            @include('layouts.partials.public-navbar')
+        @endif
 
     <main>
         @yield('content')
@@ -122,9 +64,7 @@
     <footer style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #94a3b8; padding: 5rem 2rem; text-align: center; margin-top: 6rem; border-top: 1px solid rgba(148, 163, 184, 0.1);">
         <div style="max-width: 1200px; margin: 0 auto;">
             <div style="margin-bottom: 2rem;">
-                <div style="font-size: 2rem; font-weight: 900; background: linear-gradient(135deg, #22c55e 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem;">
-                    <i class="fas fa-feather-alt"></i> أثيرا
-                </div>
+                <img src="{{ asset('assets/images/logo.png') }}" alt="أثيرا" style="height: 60px; width: auto; object-fit: contain; margin-bottom: 1rem;">
                 <p style="color: #cbd5e1; max-width: 600px; margin: 0 auto;">
                     منصة ليبية رائدة لتمكين المتطوعين وربطهم بالفرص التنموية والمهنية
                 </p>
@@ -134,5 +74,7 @@
             </p>
         </div>
     </footer>
+
+    @include('layouts.partials.photo-modal')
 </body>
 </html>

@@ -8,8 +8,8 @@
     <div class="glass-card" style="margin-bottom: 2rem; padding: 0; overflow: hidden; border-radius: 2rem; position: relative;">
         <div style="height: 160px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); position: relative;">
             <div style="position: absolute; bottom: -50px; right: 40px; display: flex; align-items: flex-end; gap: 1.5rem;">
-                <div style="position: relative;">
-                    <img src="{{ $user->avatar_url }}" style="width: 140px; height: 140px; border-radius: 2rem; object-fit: cover; border: 6px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white;">
+                <div style="position: relative; cursor: pointer;" onclick="openPhotoModal('{{ $user->avatar_url }}', '{{ $user->name }}')">
+                    <img src="{{ $user->avatar_url }}" style="width: 140px; height: 140px; border-radius: 2rem; object-fit: cover; border: 6px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     @if($user->is_active)
                     <div style="position: absolute; bottom: 10px; left: 10px; width: 20px; height: 20px; background: #10b981; border: 4px solid white; border-radius: 50%;" title="نشط الآن"></div>
                     @endif

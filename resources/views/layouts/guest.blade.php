@@ -85,9 +85,8 @@
             <div class="w-full max-w-md">
                 <!-- Logo Zone -->
                 <div class="logo-container">
-                    <a href="{{ url('/') }}" class="logo-text">
-                        <i class="fas fa-feather-alt" style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                        أثيرا
+                    <a href="{{ url('/') }}">
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="أثيرا" style="height: 70px; width: auto; margin: 0 auto; object-fit: contain;">
                     </a>
                     <p style="color: #64748b; font-weight: 800; margin-top: 0.5rem; font-size: 0.9rem;">
                         منصة التطوع والتدريب الرائدة في ليبيا

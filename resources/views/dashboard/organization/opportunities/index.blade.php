@@ -1,242 +1,180 @@
 @extends('layouts.dashboard')
-
 @section('title', 'إدارة الفرص')
 
 @section('content')
-<div style="font-family: 'Cairo', sans-serif;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+<style>
+:root{--accent:#6366f1;--accent2:#8b5cf6}
+.page-header{background:linear-gradient(135deg, #064e3b 0%, #065f46 55%, #0f766e 100%);border-radius:2rem;padding:2rem 2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;box-shadow: 0 20px 40px -15px rgba(6, 78, 59, 0.3);}
+.page-header::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;background:radial-gradient(circle,rgba(16, 185, 129, 0.2),transparent 70%);border-radius:50%}
+.page-header::after{content:'';position:absolute;bottom:-30px;left:60px;width:150px;height:150px;background:radial-gradient(circle,rgba(20, 184, 166, 0.15),transparent 70%);border-radius:50%}
+.glass-card{background:rgba(255,255,255,.97);border:1px solid rgba(255,255,255,.8);border-radius:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.05);overflow:hidden}
+.add-btn{display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 1.6rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-radius:1rem;text-decoration:none;font-weight:800;font-size:.88rem;box-shadow:0 8px 20px rgba(99,102,241,.35);transition:all .25s;border:none}
+.add-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(99,102,241,.42)}
+.opp-row{border-bottom:1px solid #f1f5f9;transition:background .18s;cursor:pointer}
+.opp-row:hover td{background:#f5f3ff}
+.opp-row td{padding:1.35rem 1.5rem;vertical-align:middle}
+.status-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .95rem;border-radius:2rem;font-weight:800;font-size:.78rem}
+.icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:.75rem;text-decoration:none;border:none;cursor:pointer;transition:all .2s;font-size:.8rem}
+</style>
+
+{{-- Header --}}
+<div class="page-header">
+    <div style="position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
         <div>
-            <h2 style="margin: 0; color: #1e293b; font-weight: 850; font-size: 1.75rem;">إدارة الفرص</h2>
-            <p style="color: #64748b; margin-top: 0.25rem; font-size: 0.95rem;">تتبع ودرة حياة فرصك التطوعية والتدريبية</p>
+            <p style="margin:0 0 .3rem;color:rgba(255,255,255,.5);font-size:.8rem;font-weight:700;letter-spacing:.06em">لوحة التحكم</p>
+            <h1 style="margin:0;color:white;font-size:1.75rem;font-weight:850">إدارة الفرص</h1>
+            <p style="margin:.4rem 0 0;color:rgba(255,255,255,.55);font-size:.88rem">تتبع دورة حياة فرصك التطوعية والتدريبية</p>
         </div>
-        @if(auth()->user()->organization->status == 'approved')
-            <a href="{{ route('organization.opportunities.create') }}" 
-               style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 0.9rem 1.75rem; border-radius: 1rem; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); transition: all 0.3s;"
-               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 20px -3px rgba(37, 99, 235, 0.3)'"
-               onmouseout="this.style.transform='none'; this.style.boxShadow='0 10px 15px -3px rgba(37, 99, 235, 0.2)'">
-                <i class="fas fa-plus"></i> إضافة فرصة جديدة
-            </a>
+        @if(auth()->user()->organization->status=='approved')
+            <a href="{{ route('organization.opportunities.create') }}" class="add-btn"><i class="fas fa-plus"></i> فرصة جديدة</a>
         @else
-            <div style="background: #f1f5f9; color: #94a3b8; padding: 0.9rem 1.75rem; border-radius: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem; border: 1px solid #e2e8f0; cursor: not-allowed;"
-                 title="يجب اعتماد المؤسسة من قبل الإدارة لتتمكن من إضافة فرص">
-                <i class="fas fa-lock"></i> إضافة فرصة جديدة (بانتظار الاعتماد)
+            <div style="display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 1.6rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);border-radius:1rem;font-weight:800;font-size:.88rem;border:1px solid rgba(255,255,255,.15);cursor:not-allowed" title="يجب اعتماد المؤسسة أولاً">
+                <i class="fas fa-lock"></i> فرصة جديدة (بانتظار الاعتماد)
             </div>
         @endif
     </div>
-
-    <div class="card" style="padding: 0; overflow: hidden; border-radius: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
-        <table style="width: 100%; border-collapse: collapse; text-align: right;">
-            <thead>
-                <tr style="background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem;">الفرصة</th>
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem;">النوع والتصنيف</th>
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem; text-align: center;">المقاعد</th>
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem; text-align: center;">المتقدمين</th>
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem;">الحالة</th>
-                    <th style="padding: 1.5rem; color: #475569; font-weight: 800; font-size: 0.9rem;">الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($opportunities as $opp)
-                    <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                        <td style="padding: 1.5rem;">
-                            <div style="font-weight: 800; color: #1e293b; font-size: 1.05rem; margin-bottom: 0.25rem;">{{ $opp->title }}</div>
-                            <div style="font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="far fa-calendar-alt"></i>
-                                تاريخ التشغيل: {{ $opp->start_date->format('Y/m/d') }}
-                            </div>
-                        </td>
-                        <td style="padding: 1.5rem;">
-                            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                                <span style="display: inline-flex; align-items: center; width: fit-content; background: {{ $opp->type == 'volunteering' ? '#ecfdf5' : '#eff6ff' }}; color: {{ $opp->type == 'volunteering' ? '#059669' : '#2563eb' }}; padding: 0.2rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 800; border: 1px solid {{ $opp->type == 'volunteering' ? '#d1fae5' : '#dbeafe' }};">
-                                    <i class="{{ $opp->type == 'volunteering' ? 'fas fa-hand-holding-heart' : 'fas fa-graduation-cap' }}" style="margin-left: 0.4rem;"></i>
-                                    {{ $opp->type == 'volunteering' ? 'تطوع' : 'تدريب' }}
-                                </span>
-                                <span style="font-size: 0.8rem; color: #64748b; font-weight: 600;">
-                                    {{ $opp->category }}
-                                </span>
-                            </div>
-                        </td>
-                        <td style="padding: 1.5rem; text-align: center;">
-                            <span style="font-weight: 800; color: #1e293b; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 0.75rem; font-size: 0.9rem;">
-                                {{ $opp->seats }}
-                            </span>
-                        </td>
-                        <td style="padding: 1.5rem; text-align: center;">
-                            <a href="{{ route('organization.applications.index', ['opportunity_id' => $opp->id]) }}" style="text-decoration: none;">
-                                <span style="font-weight: 800; color: #3b82f6; background: rgba(59, 130, 246, 0.1); padding: 0.4rem 0.8rem; border-radius: 0.75rem; font-size: 0.9rem; border: 1px solid rgba(59, 130, 246, 0.1);">
-                                    {{ $opp->applications_count }} متقدم
-                                </span>
-                            </a>
-                        </td>
-                        <td style="padding: 1.5rem;">
-                            @php
-                                $statusLabels = [
-                                    0 => ['text' => 'قيد المراجعة', 'bg' => '#fffbeb', 'color' => '#d97706', 'icon' => 'fa-clock'],
-                                    1 => ['text' => 'منشورة', 'bg' => '#ecfdf5', 'color' => '#059669', 'icon' => 'fa-check-circle'],
-                                    2 => ['text' => 'تعديلات مطلوبة', 'bg' => '#eff6ff', 'color' => '#2563eb', 'icon' => 'fa-info-circle'],
-                                    3 => ['text' => 'مرفوضة', 'bg' => '#fef2f2', 'color' => '#dc2626', 'icon' => 'fa-times-circle'],
-                                    4 => ['text' => 'قيد التنفيذ', 'bg' => '#f5f3ff', 'color' => '#7c3aed', 'icon' => 'fa-running'],
-                                    5 => ['text' => 'تم التنفيذ', 'bg' => '#f0f9ff', 'color' => '#0369a1', 'icon' => 'fa-check-double'],
-                                    8 => ['text' => 'ملغاة', 'bg' => '#f8fafc', 'color' => '#64748b', 'icon' => 'fa-ban'],
-                                    9 => ['text' => 'مغلقة', 'bg' => '#f8fafc', 'color' => '#64748b', 'icon' => 'fa-lock'],
-                                ];
-                                $s = $statusLabels[(int)$opp->status] ?? ['text' => 'غير معروف', 'bg' => '#eee', 'color' => '#666', 'icon' => 'fa-question-circle'];
-                            @endphp
-                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: {{ $s['bg'] }}; color: {{ $s['color'] }}; padding: 0.4rem 1rem; border-radius: 2rem; font-weight: 800; font-size: 0.8rem; border: 1px solid rgba(0,0,0,0.03);">
-                                <i class="fas {{ $s['icon'] }}"></i>
-                                {{ $s['text'] }}
-                            </div>
-                        </td>
-                        <td style="padding: 1.5rem;">
-                            <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                @if($opp->status == 1 || $opp->status == 9)
-                                    @php
-                                        $canStartManually = now()->startOfDay()->greaterThanOrEqualTo($opp->start_date->startOfDay());
-                                    @endphp
-                                    <form action="{{ route('organization.opportunities.start', $opp) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" 
-                                                title="{{ $canStartManually ? 'بدء التنفيذ يدوياً' : 'ستبدأ الفرصة تلقائياً في تاريخ ' . $opp->start_date->format('Y/m/d') }}" 
-                                                {{ !$canStartManually ? 'disabled' : '' }}
-                                                style="color: {{ $canStartManually ? '#7c3aed' : '#94a3b8' }}; background: white; border: 1px solid {{ $canStartManually ? '#ddd6fe' : '#e2e8f0' }}; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; cursor: {{ $canStartManually ? 'pointer' : 'not-allowed' }}; transition: all 0.2s;" 
-                                                onmouseover="{{ $canStartManually ? "this.style.background='#f5f3ff'" : "" }}" 
-                                                onmouseout="this.style.background='white'">
-                                            <i class="fas fa-play"></i>
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if($opp->status == 4)
-                                    <a href="{{ route('organization.opportunities.tracking', $opp) }}" title="تتبع التقييم" style="color: #0d9488; background: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; text-decoration: none; border: 1px solid #ccfbf1; transition: all 0.2s;" onmouseover="this.style.background='#f0fdfa'" onmouseout="this.style.background='white'">
-                                        <i class="fas fa-users-cog"></i>
-                                    </a>
-                                    <form action="{{ route('organization.opportunities.complete', $opp) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من إنهاء مرحلة التنفيذ؟ سيتم نقل جميع المشاركين إلى وضع المكتمل.')">
-                                        @csrf
-                                        <button type="submit" 
-                                                title="{{ now()->startOfDay()->greaterThanOrEqualTo($opp->end_date->startOfDay()) ? 'إنهاء التنفيذ يدوياً' : 'ستنتهي الفرصة تلقائياً بعد تاريخ ' . $opp->end_date->format('Y/m/d') }}" 
-                                                style="color: #0284c7; background: white; border: 1px solid #e0f2fe; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s;" 
-                                                onmouseover="this.style.background='#f0f9ff'" 
-                                                onmouseout="this.style.background='white'">
-                                            <i class="fas fa-stop"></i>
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if(in_array($opp->status, [1, 4]))
-                                    <button type="button" 
-                                            onclick="showCancelModal({{ $opp->id }}, '{{ addslashes($opp->title) }}')"
-                                            title="إلغاء الفرصة" 
-                                            style="color: #dc2626; background: white; border: 1px solid #fecaca; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; cursor: pointer; transition: all 0.2s;" 
-                                            onmouseover="this.style.background='#fef2f2'" 
-                                            onmouseout="this.style.background='white'">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-                                @endif
-
-                                <a href="{{ route('opportunities.show', $opp) }}" target="_blank" title="عرض" style="color: #64748b; background: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; text-decoration: none; border: 1px solid #e2e8f0;">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                @if($opp->status != 5)
-                                    <a href="{{ route('organization.opportunities.edit', $opp) }}" title="تعديل" style="color: #64748b; background: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 0.75rem; text-decoration: none; border: 1px solid #e2e8f0;">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" style="padding: 6rem 1.5rem; text-align: center;">
-                            <div style="max-width: 300px; margin: 0 auto;">
-                                <div style="width: 80px; height: 80px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-                                    <i class="fas fa-folder-open" style="font-size: 2rem; color: #cbd5e1;"></i>
-                                </div>
-                                <h3 style="color: #1e293b; font-weight: 800; margin-bottom: 0.5rem;">لا توجد فرص حالياً</h3>
-                                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem;">ابدأ بإضافة فرصتك الأولى لتصل إلى المتطوعين</p>
-                                @if(auth()->user()->organization->status == 'approved')
-                                    <a href="{{ route('organization.opportunities.create') }}" 
-                                       style="display: inline-block; background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
-                                        إضافة فرصة جديدة
-                                    </a>
-                                @else
-                                    <div style="background: #f1f5f9; color: #94a3b8; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.9rem; border: 1px solid #e2e8f0; display: inline-block; cursor: not-allowed;">
-                                        <i class="fas fa-lock"></i> بانتظار اعتماد المؤسسة
-                                    </div>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    @if($opportunities->hasPages())
-        <div style="margin-top: 2rem; display: flex; justify-content: center;">
-            <div style="background: white; padding: 0.75rem; border-radius: 1rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
-                {{ $opportunities->links() }}
-            </div>
-        </div>
-    @endif
 </div>
 
-<!-- Cancel Opportunity Modal -->
-<div id="cancelModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; font-family: 'Cairo', sans-serif;">
-    <div style="background: white; padding: 2.5rem; border-radius: 1.5rem; max-width: 500px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-            <div style="width: 48px; height: 48px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-ban" style="color: #dc2626; font-size: 1.25rem;"></i>
-            </div>
-            <div>
-                <h3 style="margin: 0; color: #1e293b; font-weight: 800; font-size: 1.25rem;">إلغاء الفرصة</h3>
-                <p style="margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.9rem;" id="opportunityTitle"></p>
-            </div>
-        </div>
-        
-        <div style="background: #fef2f2; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; border-right: 4px solid #dc2626;">
-            <p style="margin: 0; color: #991b1b; font-size: 0.9rem; font-weight: 600;">
-                <i class="fas fa-exclamation-triangle" style="margin-left: 0.5rem;"></i>
-                تحذير: هذا الإجراء لا يمكن التراجع عنه. سيتم إلغاء جميع التطبيقات المرتبطة بهذه الفرصة.
-            </p>
-        </div>
+@if(session('success'))
+    <div style="background:#ecfdf5;color:#059669;padding:1rem 1.4rem;border-radius:1.25rem;margin-bottom:1.5rem;font-weight:800;border:1px solid #a7f3d0;border-right:4px solid #10b981;display:flex;align-items:center;gap:.75rem">
+        <i class="fas fa-check-circle"></i>{{ session('success') }}
+    </div>
+@endif
+@if(session('error'))
+    <div style="background:#fef2f2;color:#dc2626;padding:1rem 1.4rem;border-radius:1.25rem;margin-bottom:1.5rem;font-weight:800;border:1px solid #fecaca;border-right:4px solid #ef4444;display:flex;align-items:center;gap:.75rem">
+        <i class="fas fa-exclamation-circle"></i>{{ session('error') }}
+    </div>
+@endif
 
-        <form id="cancelForm" method="POST">
-            @csrf
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; color: #1e293b; font-weight: 700; font-size: 0.95rem;">
-                    سبب الإلغاء <span style="color: #dc2626;">*</span>
-                </label>
-                <textarea 
-                    name="cancellation_reason" 
-                    required
-                    minlength="10"
-                    maxlength="500"
-                    rows="4"
-                    placeholder="يرجى توضيح سبب إلغاء هذه الفرصة (10 أحرف على الأقل)..."
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-family: 'Cairo', sans-serif; font-size: 0.9rem; resize: vertical; transition: all 0.2s;"
-                    onfocus="this.style.borderColor='#dc2626'; this.style.outline='none'"
-                    onblur="this.style.borderColor='#e2e8f0'"
-                ></textarea>
-                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">
-                    الحد الأدنى: 10 أحرف | الحد الأقصى: 500 حرف
-                </div>
-            </div>
+<div class="glass-card">
+    <table style="width:100%;border-collapse:collapse;text-align:right">
+        <thead>
+            <tr style="background:#f8fafc;border-bottom:2px solid #f1f5f9">
+                <th style="padding:1.25rem 1.5rem;color:#64748b;font-weight:800;font-size:.8rem">الفرصة</th>
+                <th style="padding:1.25rem 1.5rem;color:#64748b;font-weight:800;font-size:.8rem">النوع</th>
+                <th style="padding:1.25rem 1.5rem;color:#64748b;font-weight:800;font-size:.8rem;text-align:center">المقاعد</th>
+                <th style="padding:1.25rem 1.5rem;color:#64748b;font-weight:800;font-size:.8rem">الحالة</th>
+                <th style="padding:1.25rem 1.5rem;color:#64748b;font-weight:800;font-size:.8rem">إجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+        @forelse($opportunities as $opp)
+            @php
+                $accepted = $opp->acceptedApplicationsCount();
+                $canEdit  = in_array($opp->status,[\App\Models\Opportunity::STATUS_REVIEW,\App\Models\Opportunity::STATUS_NEEDS_CHANGES]) && $accepted===0;
+                $canCancel= in_array($opp->status,[\App\Models\Opportunity::STATUS_PUBLISHED,\App\Models\Opportunity::STATUS_UNDER_IMPLEMENTATION]);
+                $detailUrl= route('organization.opportunities.show',$opp);
+                $sMap=[0=>['قيد المراجعة','#f59e0b','rgba(245,158,11,.12)','fa-clock'],1=>['منشورة','#10b981','rgba(16,185,129,.12)','fa-check-circle'],2=>['تعديلات','#3b82f6','rgba(59,130,246,.12)','fa-edit'],3=>['مرفوضة','#ef4444','rgba(239,68,68,.12)','fa-times-circle'],4=>['قيد التنفيذ','#8b5cf6','rgba(139,92,246,.12)','fa-rocket'],5=>['مكتملة','#06b6d4','rgba(6,182,212,.12)','fa-check-double'],8=>['ملغاة','#94a3b8','rgba(148,163,184,.12)','fa-ban']];
+                $si=$sMap[(int)$opp->status]??$sMap[0];
+            @endphp
+            <tr class="opp-row" onclick="window.location='{{ $detailUrl }}'">
+                <td>
+                    <div style="font-weight:850;color:#1e293b;font-size:.95rem;margin-bottom:.25rem">{{ $opp->title }}</div>
+                    <div style="font-size:.78rem;color:#94a3b8;display:flex;align-items:center;gap:.4rem">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ $opp->start_date->format('Y/m/d') }} – {{ $opp->end_date->format('Y/m/d') }}
+                    </div>
+                </td>
+                <td onclick="event.stopPropagation()">
+                    <div style="display:flex;flex-direction:column;gap:.35rem">
+                        <span style="display:inline-flex;width:fit-content;align-items:center;gap:.4rem;background:{{ $opp->type=='volunteering'?'#ecfdf5':'#eff6ff' }};color:{{ $opp->type=='volunteering'?'#059669':'#2563eb' }};padding:.2rem .7rem;border-radius:.5rem;font-size:.72rem;font-weight:800">
+                            <i class="fas {{ $opp->type=='volunteering'?'fa-hand-holding-heart':'fa-graduation-cap' }}" style="font-size:.65rem"></i>
+                            {{ $opp->type=='volunteering'?'تطوع':'تدريب' }}
+                        </span>
+                        <span style="font-size:.75rem;color:#64748b;font-weight:600">{{ $opp->category }}</span>
+                    </div>
+                </td>
+                <td style="text-align:center">
+                    @php $pct = $opp->seats > 0 ? min(100,round(($accepted/$opp->seats)*100)) : 0; @endphp
+                    <div style="display:inline-flex;flex-direction:column;align-items:center;gap:.35rem;min-width:80px">
+                        <span style="font-weight:900;color:#1e293b;font-size:.9rem">{{ $accepted }}<span style="color:#94a3b8;font-weight:700"> / {{ $opp->seats }}</span></span>
+                        <div style="width:70px;height:6px;background:#f1f5f9;border-radius:6px;overflow:hidden">
+                            <div style="width:{{ $pct }}%;height:100%;background:{{ $pct>=100?'linear-gradient(90deg,#ef4444,#dc2626)':'linear-gradient(90deg,#6366f1,#8b5cf6)' }};border-radius:6px"></div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="status-pill" style="background:{{ $si[2] }};color:{{ $si[1] }}">
+                        <i class="fas {{ $si[3] }}" style="font-size:.65rem"></i> {{ $si[0] }}
+                    </span>
+                </td>
+                <td onclick="event.stopPropagation()">
+                    <div style="display:flex;gap:.4rem;align-items:center">
+                        <a href="{{ $detailUrl }}" class="icon-btn" style="background:#eff6ff;color:#6366f1;border:1px solid rgba(99,102,241,.15)" title="عرض التفاصيل"
+                           onmouseover="this.style.background='rgba(99,102,241,.15)'" onmouseout="this.style.background='#eff6ff'">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        @if($canEdit)
+                            <a href="{{ route('organization.opportunities.edit',$opp) }}" class="icon-btn" style="background:white;color:#475569;border:1px solid #e2e8f0" title="تعديل"
+                               onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        @else
+                            <div class="icon-btn" style="background:#f8fafc;color:#cbd5e1;border:1px solid #f1f5f9;cursor:not-allowed"
+                                 title="{{ $opp->status>2?'الفرصة جارية أو مكتملة':'تم قبول مشاركين' }}">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                        @endif
+                        @if($canCancel)
+                            <button onclick="openCancelModal({{ $opp->id }},'{{ addslashes($opp->title) }}')"
+                                    class="icon-btn" style="background:white;color:#ef4444;border:1px solid #fee2e2" title="إلغاء"
+                                    onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='white'">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        @endif
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" style="padding:6rem;text-align:center">
+                    <div style="width:72px;height:72px;background:linear-gradient(135deg,#f1f5f9,#e2e8f0);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem">
+                        <i class="fas fa-folder-open" style="color:#94a3b8;font-size:1.6rem"></i>
+                    </div>
+                    <h3 style="color:#1e293b;font-weight:850;margin-bottom:.5rem">لا توجد فرص بعد</h3>
+                    <p style="color:#64748b;font-size:.9rem;margin-bottom:1.5rem">أضف فرصتك الأولى لتصل إلى المتطوعين</p>
+                    @if(auth()->user()->organization->status=='approved')
+                        <a href="{{ route('organization.opportunities.create') }}" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;padding:.75rem 1.5rem;border-radius:1rem;text-decoration:none;font-weight:800">
+                            <i class="fas fa-plus"></i> إضافة فرصة
+                        </a>
+                    @endif
+                </td>
+            </tr>
+        @endforelse
+        </tbody>
+    </table>
+</div>
 
-            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-                <button type="button" 
-                        onclick="hideCancelModal()"
-                        style="padding: 0.75rem 1.5rem; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.2s;"
-                        onmouseover="this.style.background='#f1f5f9'"
-                        onmouseout="this.style.background='#f8fafc'">
-                    إلغاء
+@if($opportunities->hasPages())
+    <div style="margin-top:1.75rem;display:flex;justify-content:center">
+        {{ $opportunities->links() }}
+    </div>
+@endif
+
+{{-- Cancel Modal --}}
+<div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:9999;justify-content:center;align-items:center;backdrop-filter:blur(4px)">
+    <div style="background:white;padding:2.5rem;border-radius:2rem;max-width:500px;width:90%;box-shadow:0 30px 60px rgba(0,0,0,.3)">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#ef4444,#dc2626);border-radius:.9rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 20px rgba(239,68,68,.3)">
+            <i class="fas fa-ban" style="color:white;font-size:1.2rem"></i>
+        </div>
+        <h3 style="margin:0 0 .3rem;color:#1e293b;font-weight:850">إلغاء الفرصة</h3>
+        <p style="margin:0 0 1.5rem;color:#64748b;font-size:.88rem" id="cancelTitle"></p>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-right:4px solid #ef4444;border-radius:.75rem;padding:.9rem 1.1rem;margin-bottom:1.5rem">
+            <p style="margin:0;color:#991b1b;font-size:.83rem;font-weight:600"><i class="fas fa-exclamation-triangle" style="margin-left:.4rem"></i>سيتم إشعار جميع المتقدمين تلقائياً ولا يمكن التراجع عن هذا الإجراء.</p>
+        </div>
+        <form id="cancelForm" method="POST">@csrf
+            <label style="display:block;margin-bottom:.5rem;color:#1e293b;font-weight:800;font-size:.88rem">سبب الإلغاء <span style="color:#ef4444">*</span></label>
+            <textarea name="cancellation_reason" required minlength="10" maxlength="500" rows="4"
+                      placeholder="وضّح سبب الإلغاء (10 أحرف على الأقل)..."
+                      style="width:100%;border:1.5px solid #e2e8f0;border-radius:.9rem;padding:.8rem;font-family:'Cairo',sans-serif;font-size:.88rem;resize:vertical;outline:none;transition:border .2s;box-sizing:border-box"
+                      onfocus="this.style.borderColor='#ef4444'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+            <div style="display:flex;gap:.7rem;justify-content:flex-end;margin-top:1.4rem">
+                <button type="button" onclick="document.getElementById('cancelModal').style.display='none'"
+                        style="padding:.7rem 1.4rem;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;border-radius:.9rem;font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer">
+                    تراجع
                 </button>
-                <button type="submit"
-                        style="padding: 0.75rem 1.5rem; background: #dc2626; color: white; border: none; border-radius: 0.75rem; font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.2s;"
-                        onmouseover="this.style.background='#b91c1c'"
-                        onmouseout="this.style.background='#dc2626'">
-                    <i class="fas fa-ban" style="margin-left: 0.5rem;"></i>
-                    تأكيد الإلغاء
+                <button type="submit" style="padding:.7rem 1.4rem;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:.9rem;font-family:'Cairo',sans-serif;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(239,68,68,.3)">
+                    <i class="fas fa-ban" style="margin-left:.4rem"></i> تأكيد الإلغاء
                 </button>
             </div>
         </form>
@@ -244,60 +182,12 @@
 </div>
 
 <script>
-function showCancelModal(opportunityId, opportunityTitle) {
-    const modal = document.getElementById('cancelModal');
-    const form = document.getElementById('cancelForm');
-    const titleElement = document.getElementById('opportunityTitle');
-    
-    form.action = `/organization/opportunities/${opportunityId}/cancel`;
-    titleElement.textContent = opportunityTitle;
-    modal.style.display = 'flex';
+function openCancelModal(id, title){
+    document.getElementById('cancelForm').action = `/organization/opportunities/${id}/cancel`;
+    document.getElementById('cancelTitle').textContent = title;
+    document.getElementById('cancelModal').style.display = 'flex';
 }
-
-function hideCancelModal() {
-    const modal = document.getElementById('cancelModal');
-    const form = document.getElementById('cancelForm');
-    
-    modal.style.display = 'none';
-    form.reset();
-}
-
-// Close modal when clicking outside
-document.getElementById('cancelModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        hideCancelModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        hideCancelModal();
-    }
-});
+document.getElementById('cancelModal')?.addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('cancelModal').style.display='none'; });
 </script>
-
-<style>
-    /* Custom pagination styling if needed to match theme */
-    .pagination {
-        display: flex;
-        gap: 0.5rem;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .page-item .page-link {
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        color: #64748b;
-        text-decoration: none;
-        font-weight: 700;
-        transition: all 0.2s;
-    }
-    .page-item.active .page-link {
-        background: #3b82f6;
-        color: white;
-    }
-</style>
 @endsection
-

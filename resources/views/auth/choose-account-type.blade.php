@@ -91,10 +91,7 @@
         <!-- Header -->
         <div class="text-center mb-16 animate-fade-in">
             <a href="{{ url('/') }}" class="inline-block mb-6">
-                <div class="gradient-text text-5xl font-black flex items-center justify-center gap-3">
-                    <i class="fas fa-feather-alt"></i>
-                    <span>أثيرا</span>
-                </div>
+                <img src="{{ asset('assets/images/logo.png') }}" alt="أثيرا" style="height: 70px; width: auto; margin: 0 auto; object-fit: contain;">
             </a>
             <h1 class="text-4xl md:text-5xl font-black text-gray-800 mb-4">
                 انضم إلى مجتمعنا

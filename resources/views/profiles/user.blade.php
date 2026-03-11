@@ -12,8 +12,8 @@
             
             <div style="position: relative; z-index: 1;">
                 <!-- صورة المستخدم -->
-                <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #3b82f6, #10b981); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; font-weight: 800; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);">
-                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                <div onclick="openPhotoModal('{{ $user->avatar_url }}', '{{ $user->name }}')" style="width: 140px; height: 140px; border-radius: 2rem; margin: 0 auto 1.5rem; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 4px solid white; cursor: pointer; transition: transform 0.2s; overflow: hidden;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="{{ $user->avatar_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 
                 <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin: 0 0 0.5rem 0;">{{ $user->name }}</h1>

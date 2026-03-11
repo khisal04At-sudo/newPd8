@@ -8,8 +8,8 @@
     <div class="glass-card" style="margin-bottom: 2rem; padding: 0; overflow: hidden; border-radius: 2rem; position: relative;">
         <div style="height: 160px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); position: relative;">
             <div style="position: absolute; bottom: -50px; right: 40px; display: flex; align-items: flex-end; gap: 1.5rem;">
-                <div style="position: relative;">
-                    <img src="{{ $user->organization->logo_url ? asset('storage/' . $user->organization->logo_url) : asset('images/default-org.png') }}" style="width: 140px; height: 140px; border-radius: 2rem; object-fit: cover; border: 6px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white;">
+                <div style="position: relative; cursor: pointer;" onclick="openPhotoModal('{{ $user->avatar_url }}', '{{ $user->organization->name }}')">
+                    <img src="{{ $user->avatar_url }}" style="width: 140px; height: 140px; border-radius: 2rem; object-fit: cover; border: 6px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     @if($user->organization->verified)
                     <div style="position: absolute; top: -10px; right: -10px; width: 34px; height: 34px; background: #10b981; border: 4px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;" title="مؤسسة معتمدة">
                         <i class="fas fa-check" style="font-size: 0.8rem;"></i>

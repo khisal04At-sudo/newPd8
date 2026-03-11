@@ -76,7 +76,7 @@
 
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 30px;">
     <div class="card">
-        @if(auth()->user()->user_type === 'volunteer')
+        @if(auth()->user()->user_type === 'user')
             <h3 style="margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-star" style="color: #f59e0b;"></i> الفرص المقترحة لك
             </h3>

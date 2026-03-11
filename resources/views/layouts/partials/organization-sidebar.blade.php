@@ -1,14 +1,13 @@
-<div class="sidebar" id="sidebar">
+<div class="sidebar {{ (request()->is('dashboard*') || request()->is('volunteer*') || request()->is('organization/*') || request()->is('admin*')) ? '' : 'collapsed' }}" id="sidebar">
     <div class="sidebar-header">
         <h3>لوحة تحكم المؤسسة</h3>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="{{ url('/') }}"><i class="fas fa-globe"></i> الواجهة الرئيسية</a></li>
         @auth
+
             <li><a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="fas fa-home"></i> الرئيسية</a></li>
             <li><a href="{{ route('organization.profile.edit') }}" class="{{ request()->routeIs('organization.profile.*') ? 'active' : '' }}"><i class="fas fa-building"></i> الملف المؤسسي</a></li>
             <li><a href="{{ route('organization.opportunities.index') }}" class="{{ request()->routeIs('organization.opportunities.*') ? 'active' : '' }}"><i class="fas fa-briefcase"></i> إدارة الفرص</a></li>
-            <li><a href="{{ route('organization.applications.index') }}" class="{{ request()->routeIs('organization.applications.*') ? 'active' : '' }}"><i class="fas fa-users"></i> المتقدمين</a></li>
             <li><a href="{{ route('organization.certificates.index') }}" class="{{ request()->routeIs('organization.certificates.*') ? 'active' : '' }}"><i class="fas fa-certificate"></i> الشهادات</a></li>
             <li><a href="{{ route('organization.evaluation.requirements') }}" class="{{ request()->routeIs('organization.evaluation.requirements') ? 'active' : '' }}"><i class="fas fa-info-circle"></i> شروط التقييم</a></li>
             <li><a href="{{ route('dashboard.messages') }}" class="{{ request()->routeIs('dashboard.messages') ? 'active' : '' }}"><i class="fas fa-comments"></i> الرسائل</a></li>

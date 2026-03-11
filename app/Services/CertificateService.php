@@ -7,6 +7,8 @@ use App\Models\Certificate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 
 class CertificateService
 {
@@ -64,16 +66,21 @@ class CertificateService
         $attendedHours = $application->attended_hours;
         $percentage = ($attendedHours / $totalHours) * 100;
 
+        // Generate QR code pointing to verify page
+        $verifyUrl = url('/certificates/' . $certificateNumber . '/verify');
+        $qrCodeBase64 = $this->generateQrBase64($verifyUrl);
+
         // Generate PDF content (using Blade template)
         $pdf = Pdf::loadView('certificates.certificate_template', [
-            'application' => $application,
-            'user' => $user,
-            'recipientName' => $recipientName,
-            'opportunity' => $opportunity,
-            'organization' => $organization,
+            'application'    => $application,
+            'user'           => $user,
+            'recipientName'  => $recipientName,
+            'opportunity'    => $opportunity,
+            'organization'   => $organization,
             'certificateNumber' => $certificateNumber,
-            'percentage' => $percentage,
-            'issueDate' => now()->format('Y-m-d'),
+            'percentage'     => $percentage,
+            'issueDate'      => now()->format('Y-m-d'),
+            'qrCodeBase64'   => $qrCodeBase64,
         ])
         ->setPaper('a4', 'landscape')
         ->setOptions([
@@ -149,15 +156,40 @@ class CertificateService
         $attendedHours = $application->attended_hours;
         $percentage = ($totalHours > 0) ? ($attendedHours / $totalHours) * 100 : 0;
 
+        // QR for preview points to a placeholder verify URL
+        $qrCodeBase64 = $this->generateQrBase64(url('/certificates/PREVIEW-XXXX/verify'));
+
         return Pdf::loadView('certificates.certificate_template', [
-            'application' => $application,
-            'user' => $user,
-            'recipientName' => $recipientName,
-            'opportunity' => $opportunity,
-            'organization' => $organization,
+            'application'    => $application,
+            'user'           => $user,
+            'recipientName'  => $recipientName,
+            'opportunity'    => $opportunity,
+            'organization'   => $organization,
             'certificateNumber' => 'PREVIEW-XXXX',
-            'percentage' => $percentage,
-            'issueDate' => now()->format('Y-m-d'),
+            'percentage'     => $percentage,
+            'issueDate'      => now()->format('Y-m-d'),
+            'qrCodeBase64'   => $qrCodeBase64,
         ])->setPaper('a4', 'landscape');
+    }
+
+    /**
+     * Generate a QR code as a PNG base64 data URI (no GD required, uses SVG renderer)
+     */
+    private function generateQrBase64(string $data): string
+    {
+        $options = new QROptions([
+            'outputType'       => \chillerlan\QRCode\Output\QROutputInterface::GDIMAGE_PNG,
+            'eccLevel'         => QRCode::ECC_M,
+            'scale'            => 5,
+            'imageBase64'      => true,
+        ]);
+
+        try {
+            $qr = new QRCode($options);
+            return $qr->render($data); // returns data:image/png;base64,...
+        } catch (\Throwable $e) {
+            // Fallback: return empty string so template degrades gracefully
+            return '';
+        }
     }
 }

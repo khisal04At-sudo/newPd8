@@ -5,21 +5,28 @@
 @section('content')
 <div style="max-width: 1000px; margin: 0 auto; animation: fadeIn 0.8s ease-out;">
     <div class="glass-card" style="padding: 2.5rem; border-radius: 2rem;">
-        <div style="margin-bottom: 2.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 800;">إعدادات المؤسسة</h2>
-                <p style="color: #64748b; margin-top: 0.5rem; font-size: 0.95rem;">قم بتحديث معلومات المؤسسة، الشعار، وروابط التواصل</p>
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <div style="background: {{ $user->organization->verified ? '#f0fdf4' : '#fff7ed' }}; color: {{ $user->organization->verified ? '#16a34a' : '#ea580c' }}; padding: 0.5rem 1.25rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 700; border: 1px solid {{ $user->organization->verified ? '#bbf7d0' : '#ffedd5' }}; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas {{ $user->organization->verified ? 'fa-check-circle' : 'fa-clock' }}"></i>
-                    {{ $user->organization->verified ? 'مؤسسة معتمدة' : 'بانتظار الاعتماد' }}
-                </div>
-                <a href="{{ route('organization.profile.show') }}" style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; background: #f1f5f9; padding: 0.6rem 1.2rem; border-radius: 0.8rem;">
-                    <i class="fas fa-eye"></i> عرض البروفايل
-                </a>
-            </div>
         </div>
+
+        @if(session('success'))
+            <div style="background: #f0fdf4; color: #16a34a; padding: 1rem 1.5rem; border-radius: 1rem; border: 1px solid #bbf7d0; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div style="background: #fef2f2; color: #dc2626; padding: 1rem 1.5rem; border-radius: 1rem; border: 1px solid #fecaca; margin-bottom: 2rem; font-weight: 600;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>يرجى تصحيح الأخطاء التالية:</span>
+                </div>
+                <ul style="margin: 0; padding-right: 2rem; font-size: 0.9rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form action="{{ route('organization.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -28,9 +35,10 @@
                 <!-- Logo Section -->
                 <div style="text-align: center;">
                     <div style="position: relative; display: inline-block; margin-bottom: 1.5rem;">
-                        <img src="{{ $user->organization->logo_url ? asset('storage/' . $user->organization->logo_url) : asset('images/default-org.png') }}" 
+                        <img src="{{ $user->avatar_url }}" 
                              id="logoPreview"
-                             style="width: 200px; height: 200px; border-radius: 2rem; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white;">
+                             onclick="openPhotoModal(this.src, '{{ $user->organization->name }}')"
+                             style="width: 200px; height: 200px; border-radius: 2rem; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; cursor: pointer;">
                         <label for="logoInput" style="position: absolute; bottom: -10px; left: -10px; background: #f59e0b; color: white; width: 44px; height: 44px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 4px solid white; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                             <i class="fas fa-camera"></i>
                         </label>

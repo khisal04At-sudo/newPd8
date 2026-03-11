@@ -7,21 +7,43 @@
     <title>التحقق من الحساب</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #fdf2f8 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Cairo', 'Segoe UI', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
+        .abstract-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.5;
+            animation: float-slow 25s infinite alternate ease-in-out;
+        }
+        @keyframes float-slow {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.2); }
+        }
+        .shape-1 { width: 500px; height: 500px; background: #10b981; top: -10%;  left: -10%;  }
+        .shape-2 { width: 400px; height: 400px; background: #3b82f6; bottom: -10%; right: -10%; }
         .verify-container {
-            background: white;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 2.5rem;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
             max-width: 500px;
             width: 90%;
+            position: relative;
+            z-index: 10;
         }
         .otp-inputs {
             display: flex;
@@ -41,7 +63,7 @@
         }
         .otp-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #10b981;
             transform: scale(1.05);
         }
         .resend-timer {
@@ -50,7 +72,7 @@
             margin-top: 15px;
         }
         .resend-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -58,6 +80,7 @@
             cursor: pointer;
             transition: transform 0.2s;
             font-size: 16px;
+            font-family: inherit;
         }
         .resend-btn:hover:not(:disabled) {
             transform: translateY(-2px);
@@ -67,7 +90,7 @@
             cursor: not-allowed;
         }
         .submit-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
             color: white;
             width: 100%;
             padding: 15px;
@@ -78,6 +101,7 @@
             cursor: pointer;
             transition: transform 0.2s;
             margin-top: 20px;
+            font-family: inherit;
         }
         .submit-btn:hover {
             transform: translateY(-2px);
@@ -104,6 +128,8 @@
     </style>
 </head>
 <body>
+    <div class="abstract-shape shape-1"></div>
+    <div class="abstract-shape shape-2"></div>
     <div class="verify-container">
         <div class="icon" style="text-align: center;">🔐</div>
         <h1 style="text-align: center; color: #333; margin-bottom: 10px;">التحقق من حسابك</h1>

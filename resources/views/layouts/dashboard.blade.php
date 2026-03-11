@@ -14,12 +14,14 @@
             --sidebar-width: 260px;
             --header-height: 80px;
             --primary-color: #3b82f6;
-            --bg-color: #f8fafc;
+            --bg-color: {{ auth()->user()->user_type === 'user' ? '#eff6ff' : '#f1faed' }};
         }
         body {
             background-color: var(--bg-color);
+            background-color: var(--bg-color) !important;
             font-family: 'Cairo', sans-serif;
             margin: 0;
+            transition: background-color 0.3s ease;
         }
         .main-content {
             padding: 20px;
@@ -27,10 +29,15 @@
             transition: all 0.3s ease;
             width: 100%;
             padding-top: calc(var(--header-height) + 20px); /* Adjust for fixed header */
+            background-color: var(--bg-color);
         }
         .main-content.shifted {
-            margin-right: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
+            margin-right: var(--sidebar-width) !important;
+            width: calc(100% - var(--sidebar-width)) !important;
+        }
+        .main-content.expanded {
+            margin-right: 0 !important;
+            width: 100% !important;
         }
         .header {
             height: var(--header-height);
@@ -112,17 +119,22 @@
                 <button class="toggle-sidebar" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
+                <a href="{{ url('/') }}" style="display: flex; align-items: center; padding: 0 10px; border-left: 2px solid #e2e8f0; margin-left: 5px;">
+                    <img src="{{ asset('assets/images/logo.jpg') }}" alt="أثيرا" style="height: 45px; width: auto; object-fit: contain;">
+                </a>
                 <div class="welcome-msg">
                     أهلاً بك، <strong>{{ auth()->user()->name }}</strong>
                 </div>
             </div>
             <div class="user-nav">
-                @if(auth()->user()->user_type === 'volunteer')
+                @if(auth()->user()->user_type === 'user')
                     <div class="points" style="color: #4f46e5; font-weight: bold;">
                         <i class="fas fa-coins"></i> {{ auth()->user()->points }} نقطة
                     </div>
                 @endif
-                <img src="{{ auth()->user()->avatar_url }}" class="avatar-sm">
+                <div style="position: relative; cursor: pointer;" onclick="openPhotoModal('{{ auth()->user()->avatar_url }}', '{{ auth()->user()->name }}', true)">
+                    <img src="{{ auth()->user()->avatar_url }}" class="avatar-sm" style="border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
             </div>
         </div>
 
@@ -156,5 +168,7 @@
 
         @yield('content')
     </div>
+
+    @include('layouts.partials.photo-modal')
 </body>
 </html>

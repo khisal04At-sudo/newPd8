@@ -15,6 +15,7 @@ class Application extends Model
     const STATUS_EXECUTING = 'executing';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_WAITLISTED = 'waitlisted';
 
     protected $fillable = [
         'user_id',

@@ -195,13 +195,45 @@ class OpportunityManagementController extends Controller
         }
     }
 
+    public function show(Opportunity $opportunity)
+    {
+        $this->authorizeOwner($opportunity);
+
+        $pendingApps       = $opportunity->applications()->where('status', Application::STATUS_PENDING)->with('user', 'resumFile')->latest()->get();
+        $acceptedApps      = $opportunity->applications()->where('status', Application::STATUS_ACCEPTED)->with('user')->latest()->get();
+        $waitlistedApps    = $opportunity->applications()->where('status', Application::STATUS_WAITLISTED)->with('user')->latest()->get();
+        $evaluationApps    = $opportunity->applications()->whereIn('status', [Application::STATUS_EXECUTING, Application::STATUS_COMPLETED])->with('user')->get();
+        $acceptedCount     = $acceptedApps->count();
+        $remainingSeats    = max(0, $opportunity->seats - $acceptedCount);
+        $seatsPercentage   = min(100, $opportunity->seats > 0 ? round(($acceptedCount / $opportunity->seats) * 100) : 0);
+
+        return view('dashboard.organization.opportunities.show', compact(
+            'opportunity',
+            'pendingApps',
+            'acceptedApps',
+            'waitlistedApps',
+            'evaluationApps',
+            'acceptedCount',
+            'remainingSeats',
+            'seatsPercentage'
+        ));
+    }
+
     public function edit(Opportunity $opportunity)
     {
         $this->authorizeOwner($opportunity);
 
-        if ($opportunity->status == Opportunity::STATUS_COMPLETED) {
-            return redirect()->route('organization.opportunities.index')
-                ->with('error', 'لا يمكن تعديل فرصة مكتملة.');
+        // Allow editing only if status is under review (0) or needs changes (2)
+        // AND no applicants have been accepted yet
+        $allowedStatuses = [Opportunity::STATUS_REVIEW, Opportunity::STATUS_NEEDS_CHANGES];
+        if (!in_array($opportunity->status, $allowedStatuses)) {
+            return redirect()->route('organization.opportunities.show', $opportunity)
+                ->with('error', 'لا يمكن تعديل الفرصة في حالتها الحالية (يُسمح فقط للفرص القادمة وقبل قبول أي مشاركين).');
+        }
+
+        if ($opportunity->acceptedApplicationsCount() > 0) {
+            return redirect()->route('organization.opportunities.show', $opportunity)
+                ->with('error', 'لا يمكن تعديل الفرصة بعد قبول مشاركين.');
         }
 
         $cities = City::all();
@@ -316,6 +348,26 @@ class OpportunityManagementController extends Controller
 
         $opportunity->update($updateData);
 
+        // ===== إشعار المتطوعين المقبولين وقائمة الانتظار بتحديث بيانات الفرصة =====
+        $affectedUserIds = $opportunity->applications()
+            ->whereIn('status', [
+                Application::STATUS_ACCEPTED,
+                Application::STATUS_WAITLISTED,
+                Application::STATUS_EXECUTING,
+            ])
+            ->pluck('user_id');
+
+        foreach ($affectedUserIds as $userId) {
+            Notification::create([
+                'user_id' => $userId,
+                'title'   => '📝 تم تحديث بيانات الفرصة',
+                'message' => 'تم تحديث تفاصيل فرصة "' . $opportunity->title . '" التي تقدمت إليها. يُرجى مراجعة البيانات الجديدة.',
+                'type'    => 'opportunity',
+                'data'    => json_encode(['opportunity_id' => $opportunity->id]),
+                'is_read' => false,
+            ]);
+        }
+
         // تحديث الملف إذا تم رفعه
         if ($request->hasFile('certificate_file')) {
             // حذف القديم إن وجد
@@ -350,6 +402,23 @@ class OpportunityManagementController extends Controller
             ->update(['status' => Application::STATUS_EXECUTING]);
 
         return back()->with('success', 'تم بدء تنفيذ الفرصة بنجاح.');
+    }
+
+    public function pauseExecution(Opportunity $opportunity)
+    {
+        $this->authorizeOwner($opportunity);
+
+        if ($opportunity->status != Opportunity::STATUS_UNDER_IMPLEMENTATION) {
+            return back()->with('error', 'لا يمكن إيقاف هذه الفرصة في حالتها الحالية.');
+        }
+
+        $opportunity->update(['status' => Opportunity::STATUS_PUBLISHED]);
+
+        // Revert executing applications back to accepted
+        $opportunity->applications()->where('status', Application::STATUS_EXECUTING)
+            ->update(['status' => Application::STATUS_ACCEPTED]);
+
+        return back()->with('success', 'تم إيقاف الفرصة مؤقتاً وإعادتها لحالة المنشورة.');
     }
 
     public function completeExecution(Opportunity $opportunity)
@@ -394,18 +463,32 @@ class OpportunityManagementController extends Controller
             'cancellation_reason.max' => 'سبب الإلغاء يجب ألا يتجاوز 500 حرف.',
         ]);
 
+        // Collect affected applicant IDs before changing status
+        $affectedApplications = $opportunity->applications()
+            ->whereIn('status', [Application::STATUS_PENDING, Application::STATUS_ACCEPTED, Application::STATUS_EXECUTING, Application::STATUS_WAITLISTED])
+            ->with('user')
+            ->get();
+
         $opportunity->update([
             'status' => Opportunity::STATUS_CANCELLED,
             'cancellation_reason' => $request->cancellation_reason,
             'cancelled_at' => now(),
         ]);
 
-        // Update all related applications to cancelled
-        $opportunity->applications()
-            ->whereIn('status', [Application::STATUS_PENDING, Application::STATUS_ACCEPTED, Application::STATUS_EXECUTING])
-            ->update(['status' => Application::STATUS_CANCELLED]);
+        // Update all related applications to cancelled & notify applicants
+        foreach ($affectedApplications as $app) {
+            $app->update(['status' => Application::STATUS_CANCELLED]);
+            Notification::create([
+                'user_id' => $app->user_id,
+                'title'   => '❌ تم إلغاء الفرصة',
+                'message' => 'تم إلغاء فرصة "' . $opportunity->title . '" التي تقدمت إليها. السبب: ' . $request->cancellation_reason,
+                'type'    => 'opportunity_cancelled',
+                'data'    => json_encode(['opportunity_id' => $opportunity->id]),
+                'is_read' => false,
+            ]);
+        }
 
-        return back()->with('success', 'تم إلغاء الفرصة بنجاح.');
+        return redirect()->route('organization.opportunities.index')->with('success', 'تم إلغاء الفرصة وإشعار المتقدمين بنجاح.');
     }
 
     public function tracking(Opportunity $opportunity)

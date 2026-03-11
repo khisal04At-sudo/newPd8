@@ -107,4 +107,19 @@ class Opportunity extends Model
     {
         return $this->reviews()->avg('rating') ?: 0;
     }
+
+    public function acceptedApplicationsCount()
+    {
+        return $this->applications()->where('status', 'accepted')->count();
+    }
+
+    public function remainingSeatsCount()
+    {
+        return max(0, $this->seats - $this->acceptedApplicationsCount());
+    }
+
+    public function isFull()
+    {
+        return $this->acceptedApplicationsCount() >= $this->seats;
+    }
 }

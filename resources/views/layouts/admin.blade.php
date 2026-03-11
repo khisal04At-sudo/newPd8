@@ -205,8 +205,8 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-brand">
-            <i class="fas fa-hand-holding-heart"></i>
-            <span>أثيرا - الإدارة</span>
+            <img src="{{ asset('assets/images/logo.jpg') }}" alt="أثيرا" style="height: 40px; width: auto; object-fit: contain;">
+            <span style="font-size: 1.25rem;">- الإدارة</span>
         </div>
         <ul class="sidebar-menu">
             <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="fas fa-grid-2"></i> الرئيسية</a></li>

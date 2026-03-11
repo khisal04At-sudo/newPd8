@@ -169,9 +169,12 @@
                 </div>
                 
                 <div class="qr-box">
-                    <div class="qr-code">
-                        QR Code
-                    </div>
+                    @if(!empty($qrCodeBase64))
+                        <img src="{{ $qrCodeBase64 }}" style="width: 70px; height: 70px; border-radius: 8px; border: 2px solid #cbd5e1; display: block; margin: 0 auto;" alt="QR Code">
+                        <div style="font-size: 8px; color: #94a3b8; margin-top: 4px; text-align: center;">Scan to Verify</div>
+                    @else
+                        <div class="qr-code">QR</div>
+                    @endif
                 </div>
 
                 <div class="signature-box">

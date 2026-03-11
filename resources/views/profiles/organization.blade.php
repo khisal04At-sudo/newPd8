@@ -12,8 +12,8 @@
             
             <div style="position: relative; z-index: 1; display: flex; align-items: start; gap: 2rem;">
                 <!-- Logo -->
-                <div style="flex-shrink: 0;">
-                    <img src="{{ url($organization->logo_url ?? 'assets/default-logo.png') }}" style="width: 150px; height: 150px; border-radius: 1.5rem; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 4px solid white;">
+                <div style="flex-shrink: 0;" onclick="openPhotoModal('{{ $organization->user->avatar_url }}', '{{ $organization->name }}')">
+                    <img src="{{ $organization->user->avatar_url }}" style="width: 150px; height: 150px; border-radius: 1.5rem; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 4px solid white; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
                 
                 <!-- Info -->
@@ -36,27 +36,26 @@
                     <p style="color: #475569; line-height: 1.8; font-size: 1.05rem; margin-bottom: 1.5rem;">{{ $organization->description }}</p>
                     @endif
                     
-                    {{-- Action Buttons - Messaging coming soon --}}
-                    {{-- @auth
-                        @if(!Auth::user()->organization || Auth::user()->organization->id !== $organization->id)
-                        <div style="display: flex; gap: 1rem;">
-                            <a href="{{ route('messages.show', $organization->user) }}" class="btn-brand">
-                                <i class="fas fa-comment"></i> مراسلة المؤسسة
-                            </a>
-                            @if($organization->website)
-                            <a href="{{ $organization->website }}" target="_blank" style="padding: 0.75rem 1.5rem; background: #f1f5f9; color: #64748b; border-radius: 0.75rem; font-weight: 700; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
-                                <i class="fas fa-globe"></i> الموقع الإلكتروني
-                            </a>
-                            @endif
-                        </div>
-                        @endif
-                    @endauth --}}
-                    
-                    @if($organization->website)
-                    <div style="display: flex; gap: 1rem;">
-                        <a href="{{ $organization->website }}" target="_blank" class="btn-brand">
+                    @if($organization->social_links)
+                    <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
+                        @if(!empty($organization->social_links['website']))
+                        <a href="{{ $organization->social_links['website'] }}" target="_blank" class="btn-brand">
                             <i class="fas fa-globe"></i> الموقع الإلكتروني
                         </a>
+                        @endif
+                        
+                        <div style="display: flex; gap: 0.75rem;">
+                            @foreach($organization->social_links as $platform => $url)
+                                @if($url && $platform !== 'website')
+                                <a href="{{ $url }}" target="_blank" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: white; color: #64748b; border: 1px solid #e2e8f0; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);" onmouseover="this.style.background='#f8fafc'; this.style.color='#2563eb'; this.style.transform='translateY(-3px)'" onmouseout="this.style.background='white'; this.style.color='#64748b'; this.style.transform='none'">
+                                    @if($platform == 'facebook') <i class="fab fa-facebook-f"></i>
+                                    @elseif($platform == 'twitter') <i class="fab fa-twitter"></i>
+                                    @elseif($platform == 'instagram') <i class="fab fa-instagram"></i>
+                                    @else <i class="fas fa-link"></i> @endif
+                                </a>
+                                @endif
+                            @endforeach
+                        </div>
                     </div>
                     @endif
                 </div>

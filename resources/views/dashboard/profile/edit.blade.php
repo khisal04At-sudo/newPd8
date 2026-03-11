@@ -5,15 +5,28 @@
 @section('content')
 <div style="max-width: 900px; margin: 0 auto; animation: fadeIn 0.8s ease-out;">
     <div class="glass-card" style="padding: 2.5rem; border-radius: 2rem;">
-        <div style="margin-bottom: 2.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-            <div>
-                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 800;">إعدادات الملف الشخصي</h2>
-                <p style="color: #64748b; margin-top: 0.5rem; font-size: 0.95rem;">قم بتحديث معلوماتك الشخصية وصورة الحساب</p>
-            </div>
-            <a href="{{ route('dashboard.profile') }}" style="color: #64748b; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; background: #f1f5f9; padding: 0.6rem 1.2rem; border-radius: 0.8rem;">
-                <i class="fas fa-arrow-right"></i> العودة للملف
-            </a>
         </div>
+
+        @if(session('success'))
+            <div style="background: #f0fdf4; color: #16a34a; padding: 1rem 1.5rem; border-radius: 1rem; border: 1px solid #bbf7d0; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 600;">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div style="background: #fef2f2; color: #dc2626; padding: 1rem 1.5rem; border-radius: 1rem; border: 1px solid #fecaca; margin-bottom: 2rem; font-weight: 600;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>يرجى تصحيح الأخطاء التالية:</span>
+                </div>
+                <ul style="margin: 0; padding-right: 2rem; font-size: 0.9rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form action="{{ route('dashboard.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -24,7 +37,8 @@
                     <div style="position: relative; display: inline-block; margin-bottom: 1.5rem;">
                         <img src="{{ $user->avatar_url }}" 
                              id="avatarPreview"
-                             style="width: 180px; height: 180px; border-radius: 2rem; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white;">
+                             onclick="openPhotoModal(this.src, '{{ $user->name }}')"
+                             style="width: 180px; height: 180px; border-radius: 2rem; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); background: white; cursor: pointer;">
                         <label for="avatarInput" style="position: absolute; bottom: -10px; left: -10px; background: #4f46e5; color: white; width: 44px; height: 44px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 4px solid white; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                             <i class="fas fa-camera"></i>
                         </label>
@@ -64,7 +78,10 @@
                             @endphp
                             
                             @if($cvFile)
-                                <a href="{{ asset($cvFile->file_url) }}" target="_blank" 
+                                @php
+                                    $cvPath = str_starts_with($cvFile->file_url, 'storage/') ? substr($cvFile->file_url, 8) : $cvFile->file_url;
+                                @endphp
+                                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($cvPath) }}" target="_blank" 
                                    style="display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; padding: 0.75rem 1rem; background: #eff6ff; color: #3b82f6; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;">
                                     <i class="fas fa-file-download"></i> عرض الحالي
                                 </a>

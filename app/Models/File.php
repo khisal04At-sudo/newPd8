@@ -80,8 +80,8 @@ class File extends Model
      */
     public function deleteFile()
     {
-        if (Storage::exists($this->file_url)) {
-            Storage::delete($this->file_url);
+        if (Storage::disk('public')->exists($this->file_url)) {
+            Storage::disk('public')->delete($this->file_url);
         }
         
         return $this->delete();

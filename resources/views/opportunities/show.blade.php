@@ -188,7 +188,7 @@
                                                         </span>
                                                     </td>
                                                     <td style="padding: 1.25rem;">
-                                                        <a href="{{ route('organization.applications.index') }}" style="color: #3b82f6; font-weight: 800; text-decoration: none; border: 1px solid #3b82f6; padding: 0.4rem 1rem; border-radius: 0.75rem; font-size: 0.85rem; transition: all 0.2s;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#3b82f6'">تفاصيل الطلب</a>
+                                                        <a href="{{ route('organization.opportunities.show', $opportunity) }}" style="color: #3b82f6; font-weight: 800; text-decoration: none; border: 1px solid #3b82f6; padding: 0.4rem 1rem; border-radius: 0.75rem; font-size: 0.85rem; transition: all 0.2s;" onmouseover="this.style.background='#3b82f6'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#3b82f6'">إدارة الفرصة</a>
                                                     </td>
                                                 </tr>
                                                 @endforeach
